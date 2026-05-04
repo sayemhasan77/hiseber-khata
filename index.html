@@ -16,18 +16,23 @@
     <!-- Login Overlay -->
     <div id="loginOverlay" class="fixed inset-0 bg-indigo-900 z-[100] flex flex-col items-center justify-center p-4">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm">
-            <h2 class="text-2xl font-bold text-center mb-6 text-indigo-800 italic">হিসেবের খাতা</h2>
+            <h2 class="text-2xl font-bold text-center mb-2 text-indigo-800 italic">হিসেবের খাতা</h2>
+            <p class="text-center text-gray-500 text-sm mb-6">আপনার মেস আইডি দিয়ে প্রবেশ করুন</p>
+            
+            <input type="text" id="messIdInput" placeholder="মেস আইডি (উদা: mess123)" class="w-full border-2 border-gray-200 p-3 rounded-xl mb-4 text-center focus:border-indigo-500 outline-none">
             <input type="password" id="adminPass" placeholder="পাসওয়ার্ড (1234)" class="w-full border-2 border-gray-200 p-3 rounded-xl mb-4 text-center focus:border-indigo-500 outline-none">
+            
             <button onclick="checkLogin()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg">প্রবেশ করুন</button>
-            <p id="errorMsg" class="text-red-500 text-sm mt-3 text-center hidden">ভুল পাসওয়ার্ড!</p>
+            <p id="errorMsg" class="text-red-500 text-sm mt-3 text-center hidden">ভুল আইডি বা পাসওয়ার্ড!</p>
         </div>
     </div>
 
+    <!-- Main Dashboard -->
     <div id="mainDashboard" class="hidden flex flex-col md:flex-row h-screen overflow-hidden">
-        
         <!-- PC Sidebar -->
         <aside class="hidden md:flex w-72 bg-slate-900 text-white flex-col p-6 space-y-6">
             <h1 class="text-2xl font-black text-yellow-400 border-b border-slate-700 pb-4">হিসেবের খাতা</h1>
+            <p class="text-xs text-slate-400">মেস আইডি: <span id="displayMessId" class="text-white font-bold"></span></p>
             <nav class="space-y-2 flex-1">
                 <button onclick="showSection('summary')" class="nav-btn w-full text-left p-3 hover:bg-slate-800 rounded-xl transition"><i class="fas fa-home mr-3 text-blue-400"></i>ড্যাশবোর্ড</button>
                 <button onclick="showSection('meals')" class="nav-btn w-full text-left p-3 hover:bg-slate-800 rounded-xl transition"><i class="fas fa-utensils mr-3 text-green-400"></i>মিল এন্ট্রি</button>
@@ -39,16 +44,14 @@
             <button onclick="logout()" class="text-gray-400 hover:text-red-400 transition text-sm pt-4 border-t border-slate-700"><i class="fas fa-sign-out-alt mr-2"></i>লগআউট</button>
         </aside>
 
-        <!-- Main Content -->
+        <!-- Main Content (Rest of the HTML stays the same as your code) -->
         <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-10">
-            
             <!-- SUMMARY SECTION -->
             <section id="summary-section" class="section-content">
                 <header class="mb-8">
                     <h2 class="text-2xl font-bold text-gray-800">মেস সামারি</h2>
                     <p class="text-gray-500">চলতি মাসের আর্থিক হিসাব</p>
                 </header>
-
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-blue-500">
                         <p class="text-gray-400 text-xs font-bold uppercase">মোট বাজার</p>
@@ -67,7 +70,6 @@
                         <h3 class="text-xl font-black text-gray-800">৳ <span id="totalOthersDisplay">0</span></h3>
                     </div>
                 </div>
-
                 <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
                     <table class="w-full text-left">
                         <thead class="bg-slate-800 text-white text-sm">
@@ -171,7 +173,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // আপনার Firebase কনফিগারেশন
+        // Firebase Configuration (Same as before)
         const firebaseConfig = {
             apiKey: "AIzaSyBB02NmJpHi0WS8wUv_JwGZ_scsRRNx7GA",
             authDomain: "hiseber-khata-743e5.firebaseapp.com",
@@ -183,44 +185,67 @@
             measurementId: "G-TK0WR2VMD9"
         };
 
-        // Firebase ইনিশিয়ালাইজেশন
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const dataRef = db.ref('mess_data');
+        let dataRef; 
+        let currentMessId = "";
 
         let localData = {
-            members: [],
-            market: [],
-            dailyMeals: {},
-            otherExpenses: [],
-            deposits: []
+            members: [], market: [], dailyMeals: {}, otherExpenses: [], deposits: []
         };
 
+        // --- Multi-User Login Logic ---
+        window.onload = function() {
+            const savedMessId = localStorage.getItem('messId');
+            if(savedMessId) {
+                currentMessId = savedMessId;
+                loginToMess(currentMessId);
+            }
+        }
+
         function checkLogin() {
-            if(document.getElementById('adminPass').value === "1234") {
-                document.getElementById('loginOverlay').classList.add('hidden');
-                document.getElementById('mainDashboard').classList.remove('hidden');
-                init();
+            const mId = document.getElementById('messIdInput').value.trim().toLowerCase();
+            const pass = document.getElementById('adminPass').value;
+            
+            if(mId && pass === "1234") {
+                currentMessId = mId;
+                localStorage.setItem('messId', currentMessId);
+                loginToMess(currentMessId);
             } else {
                 document.getElementById('errorMsg').classList.remove('hidden');
             }
         }
 
+        function loginToMess(messId) {
+            document.getElementById('loginOverlay').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('hidden');
+            document.getElementById('displayMessId').innerText = messId;
+            
+            // Connect to specific mess folder in Firebase
+            dataRef = db.ref('public_messes/' + messId);
+            init();
+        }
+
+        function logout() {
+            localStorage.removeItem('messId');
+            location.reload();
+        }
+
         function init() {
             document.getElementById('mealDate').valueAsDate = new Date();
-            
-            // Firebase থেকে ডাটা লিসেন করা (Real-time)
             dataRef.on('value', (snapshot) => {
                 const cloudData = snapshot.val();
                 if (cloudData) {
                     localData = cloudData;
-                    // নিশ্চিত করা যেন অ্যারেগুলো ঠিক থাকে (ফায়ারবেজ খালি থাকলে অবজেক্ট পাঠাতে পারে)
                     if(!Array.isArray(localData.members)) localData.members = [];
                     if(!Array.isArray(localData.market)) localData.market = [];
                     if(!Array.isArray(localData.otherExpenses)) localData.otherExpenses = [];
                     if(!Array.isArray(localData.deposits)) localData.deposits = [];
                     if(!localData.dailyMeals) localData.dailyMeals = {};
                     refreshUI();
+                } else {
+                    // New Mess ID initialization
+                    saveData();
                 }
             });
         }
@@ -241,10 +266,10 @@
         }
 
         function saveData() {
-            dataRef.set(localData);
+            if(dataRef) dataRef.set(localData);
         }
 
-        // --- MEMBER LOGIC ---
+        // --- Logic Functions (Same as your original code, simplified for size) ---
         function addMember() {
             const name = document.getElementById('newMemberName').value.trim();
             if(name && !localData.members.includes(name)) {
@@ -270,7 +295,6 @@
             `).join('');
         }
 
-        // --- DEPOSIT LOGIC ---
         function addDeposit() {
             const name = document.getElementById('depositMemberSelect').value;
             const amount = parseFloat(document.getElementById('depositAmount').value);
@@ -291,7 +315,6 @@
             `).join('');
         }
 
-        // --- MARKET LOGIC ---
         function addMarket() {
             const name = document.getElementById('marketMemberSelect').value;
             const amount = parseFloat(document.getElementById('marketAmount').value);
@@ -313,7 +336,6 @@
             `).join('');
         }
 
-        // --- MEAL LOGIC ---
         function renderMealEntry() {
             const date = document.getElementById('mealDate').value;
             const dailyData = localData.dailyMeals[date] || {};
@@ -336,7 +358,6 @@
             alert("মিল সেভ হয়েছে!");
         }
 
-        // --- OTHERS ---
         function addOtherExpense() {
             const name = document.getElementById('expName').value;
             const amount = parseFloat(document.getElementById('expAmount').value);
@@ -357,13 +378,11 @@
             `).join('');
         }
 
-        // Helper to delete items
         function deleteItem(type, index) {
             localData[type].splice(index, 1);
             saveData();
         }
 
-        // --- FINAL CALCULATION ---
         function renderSummary() {
             let totalMarket = localData.market.reduce((sum, item) => sum + item.amount, 0);
             let totalOthers = localData.otherExpenses.reduce((sum, item) => sum + item.amount, 0);
@@ -413,15 +432,11 @@
         function showSection(id) {
             document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
             document.getElementById(id + '-section').classList.remove('hidden');
-            
-            // Mobile Nav update
             document.querySelectorAll('nav button').forEach(b => b.classList.replace('text-indigo-600', 'text-gray-400'));
             if(window.event) window.event.currentTarget.classList.replace('text-gray-400', 'text-indigo-600');
         }
 
-        function logout() { location.reload(); }
         document.getElementById('mealDate').addEventListener('change', renderMealEntry);
-
     </script>
 </body>
 </html>
