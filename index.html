@@ -6,202 +6,208 @@
     <title>হিসেবের খাতা - মেস ম্যানেজমেন্ট</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- PDF Generation Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;700;800&family=Hind+Siliguri:wght@400;600;700&display=swap');
-        
         body { font-family: 'Hind Siliguri', sans-serif; }
-        
         .premium-logo {
             font-family: 'Anek Bangla', sans-serif;
             background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .nav-btn:hover { background-color: rgba(79, 70, 229, 0.1); color: #4f46e5; }
-        .active-nav { background-color: rgba(79, 70, 229, 0.1); color: #4f46e5; font-weight: bold; border-right: 4px solid #4f46e5; }
-        
-        /* Custom scrollbar for better UI */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-
+        .active-nav { background-color: rgba(79, 70, 229, 0.1); color: #4f46e5; font-weight: bold; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .section-content { transition: all 0.3s ease-in-out; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-100 min-h-screen pb-20 md:pb-0">
 
     <!-- Auth Overlay -->
-    <div id="loginOverlay" class="fixed inset-0 bg-indigo-900 z-[100] flex flex-col items-center justify-center p-4">
-        <div class="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md border border-white/20">
+    <div id="loginOverlay" class="fixed inset-0 bg-indigo-900 z-[100] flex flex-col items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md">
             <div class="text-center mb-8">
                 <h2 class="text-5xl font-extrabold premium-logo mb-2">হিসেবের খাতা</h2>
-                <p class="text-gray-500 text-sm">ডিজিটাল মেস ম্যানেজমেন্ট সিস্টেম</p>
+                <p class="text-gray-500 text-sm">আপনার মেস ম্যানেজমেন্ট এখন আরও সহজ</p>
             </div>
-
-            <div class="flex bg-gray-100 p-1.5 rounded-2xl mb-6">
+            <div class="flex bg-gray-100 p-1.5 rounded-2xl mb-8">
                 <button id="loginTab" onclick="toggleAuthMode('login')" class="flex-1 py-3 text-sm font-bold rounded-xl transition-all bg-white text-indigo-600 shadow-sm">লগইন</button>
-                <button id="registerTab" onclick="toggleAuthMode('register')" class="flex-1 py-3 text-sm font-bold rounded-xl transition-all text-gray-500">নতুন মেস</button>
+                <button id="registerTab" onclick="toggleAuthMode('register')" class="flex-1 py-3 text-sm font-bold rounded-xl transition-all text-gray-500">নতুন অ্যাকাউন্ট</button>
             </div>
-            
-            <div id="authForms" class="space-y-4">
-                <input type="text" id="messId" placeholder="মেস আইডি (উদা: mess2026)" class="w-full border-2 border-gray-100 p-4 rounded-2xl focus:border-indigo-500 outline-none transition-all">
+            <div class="space-y-5">
+                <input type="text" id="messId" placeholder="মেস আইডি (যেমন: mess2026)" class="w-full border-2 border-gray-100 p-4 rounded-2xl focus:border-indigo-500 outline-none transition-all">
                 <input type="password" id="adminPass" placeholder="পাসওয়ার্ড" class="w-full border-2 border-gray-100 p-4 rounded-2xl focus:border-indigo-500 outline-none transition-all">
                 <div id="confirmPassContainer" class="hidden">
                     <input type="password" id="confirmPass" placeholder="পাসওয়ার্ড নিশ্চিত করুন" class="w-full border-2 border-gray-100 p-4 rounded-2xl focus:border-indigo-500 outline-none transition-all">
                 </div>
-                <button id="authActionBtn" onclick="handleAuth()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-xl hover:bg-indigo-700 transition-all">প্রবেশ করুন</button>
-                <p id="errorMsg" class="text-red-500 text-xs text-center hidden font-medium bg-red-50 p-2 rounded-lg"></p>
+                <button id="authActionBtn" onclick="handleAuth()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:bg-indigo-700 shadow-xl transition-all">প্রবেশ করুন</button>
             </div>
+            <p id="errorMsg" class="text-red-500 text-xs mt-4 text-center bg-red-50 p-2 rounded-lg hidden font-medium"></p>
         </div>
     </div>
 
-    <!-- Dashboard -->
+    <!-- Main Dashboard -->
     <div id="mainDashboard" class="hidden flex flex-col md:flex-row h-screen overflow-hidden">
         
-        <!-- Sidebar (PC) -->
-        <aside class="hidden md:flex w-72 bg-slate-900 text-white flex-col p-6">
-            <h1 class="text-2xl font-black mb-8 border-b border-slate-800 pb-4 premium-logo" style="-webkit-text-fill-color: white;">হিসেবের খাতা</h1>
+        <!-- PC Sidebar -->
+        <aside class="hidden md:flex w-72 bg-slate-900 text-white flex-col p-6 space-y-6">
+            <h1 class="text-3xl font-extrabold premium-logo text-center py-4 border-b border-slate-800">হিসেবের খাতা</h1>
+            <div class="text-xs text-slate-400 bg-slate-800 p-3 rounded-xl">
+                <i class="fas fa-id-badge mr-2"></i>ID: <span id="displayMessId" class="text-indigo-400 font-bold"></span>
+            </div>
             <nav class="space-y-2 flex-1">
-                <button onclick="showSection('summary')" id="pc-summary" class="nav-btn w-full text-left p-4 rounded-xl transition active-nav"><i class="fas fa-chart-pie mr-3"></i>ড্যাশবোর্ড</button>
-                <button onclick="showSection('meals')" id="pc-meals" class="nav-btn w-full text-left p-4 rounded-xl transition"><i class="fas fa-utensils mr-3"></i>মিল এন্ট্রি</button>
-                <button onclick="showSection('deposit')" id="pc-deposit" class="nav-btn w-full text-left p-4 rounded-xl transition"><i class="fas fa-wallet mr-3"></i>জমা (Deposit)</button>
-                <button onclick="showSection('market')" id="pc-market" class="nav-btn w-full text-left p-4 rounded-xl transition"><i class="fas fa-shopping-cart mr-3"></i>বাজার লিস্ট</button>
-                <button onclick="showSection('others')" id="pc-others" class="nav-btn w-full text-left p-4 rounded-xl transition"><i class="fas fa-tags mr-3"></i>অন্যান্য খরচ</button>
-                <button onclick="showSection('members')" id="pc-members" class="nav-btn w-full text-left p-4 rounded-xl transition"><i class="fas fa-users mr-3"></i>মেম্বার</button>
+                <button onclick="showSection('summary')" id="pc-summary" class="nav-btn w-full text-left p-3.5 rounded-xl active-nav"><i class="fas fa-home mr-3 text-blue-400"></i>ড্যাশবোর্ড</button>
+                <button onclick="showSection('meals')" id="pc-meals" class="nav-btn w-full text-left p-3.5 rounded-xl"><i class="fas fa-utensils mr-3 text-green-400"></i>মিল এন্ট্রি</button>
+                <button onclick="showSection('deposit')" id="pc-deposit" class="nav-btn w-full text-left p-3.5 rounded-xl"><i class="fas fa-hand-holding-usd mr-3 text-teal-400"></i>জমা (Deposit)</button>
+                <button onclick="showSection('market')" id="pc-market" class="nav-btn w-full text-left p-3.5 rounded-xl"><i class="fas fa-shopping-basket mr-3 text-yellow-400"></i>বাজার লিস্ট</button>
+                <button onclick="showSection('others')" id="pc-others" class="nav-btn w-full text-left p-3.5 rounded-xl"><i class="fas fa-wallet mr-3 text-red-400"></i>অন্যান্য ব্যয়</button>
+                <button onclick="showSection('members')" id="pc-members" class="nav-btn w-full text-left p-3.5 rounded-xl"><i class="fas fa-user-plus mr-3 text-purple-400"></i>মেম্বার ম্যানেজমেন্ট</button>
             </nav>
-            <button onclick="logout()" class="text-slate-500 hover:text-red-400 p-4 border-t border-slate-800 text-left"><i class="fas fa-power-off mr-3"></i>লগআউট</button>
+            <button onclick="logout()" class="text-gray-400 hover:text-red-400 transition text-sm pt-4 border-t border-slate-800"><i class="fas fa-sign-out-alt mr-2"></i>লগআউট</button>
         </aside>
 
-        <!-- Content Area -->
-        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-8 pb-24 md:pb-8">
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-10">
             
-            <!-- Dynamic Sections -->
-            <div id="sections-container">
-                
-                <!-- SUMMARY -->
-                <section id="summary-section" class="section-content">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-bold text-slate-800"><i class="fas fa-calendar-alt mr-2 text-indigo-500"></i>এই মাসের সামারি</h2>
-                        <button onclick="downloadPDF()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg flex items-center">
-                            <i class="fas fa-file-export mr-2"></i>PDF
-                        </button>
+            <!-- Summary -->
+            <section id="summary-section" class="section-content">
+                <header class="mb-8 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">মেস সামারি</h2>
+                        <p class="text-gray-500">চলতি মাসের আর্থিক রিপোর্ট</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="logout()" class="md:hidden bg-red-50 text-red-600 w-11 h-11 flex items-center justify-center rounded-xl border border-red-100"><i class="fas fa-sign-out-alt"></i></button>
+                        <button onclick="downloadPDF()" class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center"><i class="fas fa-file-pdf mr-2"></i>PDF</button>
+                    </div>
+                </header>
+
+                <div id="pdf-area" class="bg-white rounded-3xl shadow-sm p-6">
+                    <div id="pdf-header" class="hidden text-center py-6 border-b mb-6">
+                        <h1 class="text-3xl font-bold text-indigo-600">হিসেবের খাতা রিপোর্ট</h1>
+                        <p id="pdf-month-title" class="text-gray-600"></p>
                     </div>
 
-                    <div id="pdf-area">
-                        <!-- Stats Grid -->
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                            <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
-                                <p class="text-gray-400 text-xs font-bold uppercase">মোট বাজার</p>
-                                <h3 class="text-xl font-black text-slate-800">৳ <span id="totalMarketDisplay">0</span></h3>
-                            </div>
-                            <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
-                                <p class="text-gray-400 text-xs font-bold uppercase">মোট মিল</p>
-                                <h3 class="text-xl font-black text-slate-800"><span id="totalMealDisplay">0</span></h3>
-                            </div>
-                            <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
-                                <p class="text-gray-400 text-xs font-bold uppercase">মিল রেট</p>
-                                <h3 class="text-xl font-black text-indigo-600">৳ <span id="mealRateDisplay">0</span></h3>
-                            </div>
-                            <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
-                                <p class="text-gray-400 text-xs font-bold uppercase">অন্যান্য</p>
-                                <h3 class="text-xl font-black text-slate-800">৳ <span id="totalOthersDisplay">0</span></h3>
-                            </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100">
+                            <p class="text-blue-500 text-xs font-bold uppercase">মোট বাজার</p>
+                            <h3 class="text-xl font-black text-blue-900">৳ <span id="totalMarketDisplay">0</span></h3>
                         </div>
-
-                        <!-- Table -->
-                        <div class="bg-white rounded-3xl shadow-sm overflow-x-auto border border-gray-100">
-                            <table class="w-full text-left min-w-[500px]">
-                                <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
-                                    <tr>
-                                        <th class="p-5">নাম</th>
-                                        <th class="p-5 text-center">মিল</th>
-                                        <th class="p-5 text-center">জমা</th>
-                                        <th class="p-5 text-center">খরচ</th>
-                                        <th class="p-5 text-center">ব্যালেন্স</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="personalSummaryTable" class="divide-y divide-gray-50 text-sm"></tbody>
-                            </table>
+                        <div class="bg-green-50 p-5 rounded-2xl border border-green-100">
+                            <p class="text-green-500 text-xs font-bold uppercase">মোট মিল</p>
+                            <h3 class="text-xl font-black text-green-900"><span id="totalMealDisplay">0</span></h3>
+                        </div>
+                        <div class="bg-orange-50 p-5 rounded-2xl border border-orange-100">
+                            <p class="text-orange-500 text-xs font-bold uppercase">মিল রেট</p>
+                            <h3 class="text-xl font-black text-orange-900">৳ <span id="mealRateDisplay">0</span></h3>
+                        </div>
+                        <div class="bg-red-50 p-5 rounded-2xl border border-red-100">
+                            <p class="text-red-500 text-xs font-bold uppercase">অন্যান্য খরচ</p>
+                            <h3 class="text-xl font-black text-red-900">৳ <span id="totalOthersDisplay">0</span></h3>
                         </div>
                     </div>
-                </section>
 
-                <!-- MEALS -->
-                <section id="meals-section" class="section-content hidden">
-                    <h2 class="text-xl font-bold mb-4">ডেইলি মিল এন্ট্রি</h2>
-                    <div class="bg-white p-6 rounded-3xl shadow-sm max-w-xl border border-gray-100">
-                        <input type="date" id="mealDate" class="w-full border-2 border-gray-50 p-4 rounded-2xl mb-6 bg-gray-50 outline-none focus:border-indigo-500">
-                        <div id="mealEntryList" class="space-y-3"></div>
-                        <button onclick="saveDailyMeals()" class="mt-6 w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold">সেভ করুন</button>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm border-collapse">
+                            <thead class="bg-slate-900 text-white">
+                                <tr>
+                                    <th class="p-4 rounded-tl-xl">নাম</th>
+                                    <th class="p-4 text-center">মিল</th>
+                                    <th class="p-4 text-center">জমা</th>
+                                    <th class="p-4 text-center">খরচ</th>
+                                    <th class="p-4 text-center rounded-tr-xl">ব্যালেন্স</th>
+                                </tr>
+                            </thead>
+                            <tbody id="personalSummaryTable" class="divide-y divide-gray-100"></tbody>
+                        </table>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- DEPOSIT -->
-                <section id="deposit-section" class="section-content hidden">
-                    <h2 class="text-xl font-bold mb-4">জমা (Deposit)</h2>
-                    <div class="flex flex-col md:flex-row gap-4 mb-6">
-                        <select id="depositMemberSelect" class="flex-1 p-4 border-2 border-gray-50 rounded-2xl bg-white outline-none"></select>
-                        <input type="number" id="depositAmount" placeholder="টাকার পরিমাণ" class="flex-1 p-4 border-2 border-gray-50 rounded-2xl outline-none">
-                        <button onclick="addDeposit()" class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold">জমা</button>
+            <!-- Meal Entry Section -->
+            <section id="meals-section" class="section-content hidden">
+                <h2 class="text-2xl font-bold mb-6">প্রতিদিনের মিল এন্ট্রি</h2>
+                <div class="bg-white rounded-3xl p-8 max-w-xl shadow-sm">
+                    <div class="mb-6">
+                        <label class="text-xs font-bold text-gray-400 uppercase">তারিখ নির্বাচন</label>
+                        <input type="date" id="mealDate" onchange="renderMealEntry()" class="w-full border-2 border-gray-50 p-4 rounded-2xl mt-1 bg-gray-50 outline-none focus:border-indigo-500">
                     </div>
-                    <div id="depositList" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-                </section>
+                    <div id="mealEntryList" class="space-y-3"></div>
+                    <button onclick="saveDailyMeals()" class="mt-8 w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition-all">সেভ করুন</button>
+                </div>
+            </section>
 
-                <!-- MARKET -->
-                <section id="market-section" class="section-content hidden">
-                    <h2 class="text-xl font-bold mb-4">বাজার লিস্ট</h2>
-                    <div class="flex flex-col md:flex-row gap-4 mb-6">
-                        <select id="marketMemberSelect" class="flex-1 p-4 border-2 border-gray-50 rounded-2xl bg-white outline-none"></select>
-                        <input type="number" id="marketAmount" placeholder="বাজারের খরচ" class="flex-1 p-4 border-2 border-gray-50 rounded-2xl outline-none">
-                        <button onclick="addMarket()" class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold">অ্যাড</button>
-                    </div>
-                    <div id="marketList" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-                </section>
+            <!-- Deposit Section -->
+            <section id="deposit-section" class="section-content hidden">
+                <h2 class="text-2xl font-bold mb-6">টাকা জমা</h2>
+                <div class="bg-white p-6 rounded-3xl mb-8 max-w-2xl shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <select id="depositMemberSelect" class="border p-4 rounded-2xl bg-gray-50"></select>
+                    <input type="number" id="depositAmount" placeholder="টাকার পরিমাণ" class="border p-4 rounded-2xl bg-gray-50">
+                    <button onclick="addDeposit()" class="bg-teal-600 text-white rounded-2xl font-bold">জমা দিন</button>
+                </div>
+                <div class="bg-white rounded-3xl shadow-sm overflow-hidden max-w-2xl">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 font-bold"><tr><th class="p-4">নাম</th><th class="p-4">টাকা</th><th class="p-4 text-right">একশন</th></tr></thead>
+                        <tbody id="depositTableBody" class="divide-y divide-gray-50"></tbody>
+                    </table>
+                </div>
+            </section>
 
-                <!-- OTHERS -->
-                <section id="others-section" class="section-content hidden">
-                    <h2 class="text-xl font-bold mb-4">অন্যান্য ব্যয় (ফিক্সড খরচ)</h2>
-                    <div class="flex flex-col md:flex-row gap-4 mb-6">
-                        <input type="text" id="expName" placeholder="খরচের নাম (উদা: ঘর ভাড়া)" class="flex-1 p-4 border-2 border-gray-50 rounded-2xl outline-none">
-                        <input type="number" id="expAmount" placeholder="টাকা" class="flex-1 p-4 border-2 border-gray-50 rounded-2xl outline-none">
-                        <button onclick="addOtherExpense()" class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold">যোগ করুন</button>
-                    </div>
-                    <div id="othersList" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-                </section>
+            <!-- Market Section -->
+            <section id="market-section" class="section-content hidden">
+                <h2 class="text-2xl font-bold mb-6">বাজার খরচ</h2>
+                <div class="bg-white p-6 rounded-3xl mb-8 max-w-2xl shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <select id="marketMemberSelect" class="border p-4 rounded-2xl bg-gray-50"></select>
+                    <input type="number" id="marketAmount" placeholder="বাজার খরচ" class="border p-4 rounded-2xl bg-gray-50">
+                    <button onclick="addMarket()" class="bg-yellow-500 text-white rounded-2xl font-bold">অ্যাড</button>
+                </div>
+                <div class="bg-white rounded-3xl shadow-sm overflow-hidden max-w-2xl">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 font-bold"><tr><th class="p-4">নাম</th><th class="p-4 text-center">তারিখ</th><th class="p-4">টাকা</th><th class="p-4 text-right">ডিলিট</th></tr></thead>
+                        <tbody id="marketTableBody" class="divide-y divide-gray-50"></tbody>
+                    </table>
+                </div>
+            </section>
 
-                <!-- MEMBERS -->
-                <section id="members-section" class="section-content hidden">
-                    <h2 class="text-xl font-bold mb-4">মেম্বার ম্যানেজমেন্ট</h2>
-                    <div class="flex gap-4 mb-6">
-                        <input type="text" id="newMemberName" placeholder="মেম্বার নাম" class="flex-1 p-4 border-2 border-gray-50 rounded-2xl outline-none">
-                        <button onclick="addMember()" class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold">অ্যাড</button>
-                    </div>
-                    <div id="membersDisplayList" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
-                </section>
+            <!-- Others Section -->
+            <section id="others-section" class="section-content hidden">
+                <h2 class="text-2xl font-bold mb-6">অন্যান্য ব্যয়</h2>
+                <div class="bg-white p-6 rounded-3xl mb-8 max-w-2xl shadow-sm flex gap-4">
+                    <input type="text" id="expName" placeholder="খরচের নাম" class="flex-1 border p-4 rounded-2xl bg-gray-50">
+                    <input type="number" id="expAmount" placeholder="টাকা" class="w-32 border p-4 rounded-2xl bg-gray-50">
+                    <button onclick="addOtherExpense()" class="bg-red-500 text-white px-6 rounded-2xl font-bold">যোগ</button>
+                </div>
+                <div id="othersList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </section>
 
-            </div>
+            <!-- Members Section -->
+            <section id="members-section" class="section-content hidden">
+                <h2 class="text-2xl font-bold mb-6">মেম্বার ম্যানেজমেন্ট</h2>
+                <div class="bg-white p-6 rounded-3xl mb-8 max-w-lg shadow-sm flex gap-4">
+                    <input type="text" id="newMemberName" placeholder="নতুন মেম্বার নাম" class="flex-1 border p-4 rounded-2xl bg-gray-50">
+                    <button onclick="addMember()" class="bg-purple-600 text-white px-8 py-4 rounded-2xl font-bold">অ্যাড</button>
+                </div>
+                <div id="membersDisplayList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+            </section>
         </main>
 
-        <!-- Mobile Bottom Nav -->
-        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-3 z-50">
-            <button onclick="showSection('summary')" class="flex flex-col items-center text-indigo-600"><i class="fas fa-home text-lg"></i><span class="text-[10px] font-bold">হোম</span></button>
-            <button onclick="showSection('meals')" class="flex flex-col items-center text-gray-400"><i class="fas fa-utensils text-lg"></i><span class="text-[10px] font-bold">মিল</span></button>
-            <button onclick="showSection('deposit')" class="flex flex-col items-center text-gray-400"><i class="fas fa-wallet text-lg"></i><span class="text-[10px] font-bold">জমা</span></button>
-            <button onclick="showSection('market')" class="flex flex-col items-center text-gray-400"><i class="fas fa-shopping-cart text-lg"></i><span class="text-[10px] font-bold">বাজার</span></button>
-            <button onclick="showSection('members')" class="flex flex-col items-center text-gray-400"><i class="fas fa-users text-lg"></i><span class="text-[10px] font-bold">মেম্বার</span></button>
+        <!-- Mobile Nav -->
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-4 z-50">
+            <button onclick="showSection('summary')" class="flex flex-col items-center text-indigo-600"><i class="fas fa-home"></i><span class="text-[10px]">হোম</span></button>
+            <button onclick="showSection('meals')" class="flex flex-col items-center text-gray-400"><i class="fas fa-utensils"></i><span class="text-[10px]">মিল</span></button>
+            <button onclick="showSection('deposit')" class="flex flex-col items-center text-gray-400"><i class="fas fa-hand-holding-usd"></i><span class="text-[10px]">জমা</span></button>
+            <button onclick="showSection('market')" class="flex flex-col items-center text-gray-400"><i class="fas fa-shopping-basket"></i><span class="text-[10px]">বাজার</span></button>
+            <button onclick="showSection('members')" class="flex flex-col items-center text-gray-400"><i class="fas fa-users"></i><span class="text-[10px]">মেম্বার</span></button>
         </nav>
     </div>
 
-    <!-- Firebase -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // Firebase Config (একই রাখা হয়েছে)
         const firebaseConfig = {
             apiKey: "AIzaSyBB02NmJpHi0WS8wUv_JwGZ_scsRRNx7GA",
             authDomain: "hiseber-khata-743e5.firebaseapp.com",
@@ -214,52 +220,58 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let currentMessId = localStorage.getItem('active_mess_id') || "";
+        let currentMessId = "";
+        let authMode = 'login';
         let localData = { members: [], market: [], dailyMeals: {}, otherExpenses: [], deposits: [] };
 
-        // Auto Login
-        if(currentMessId) {
-            document.getElementById('loginOverlay').classList.add('hidden');
-            document.getElementById('mainDashboard').classList.remove('hidden');
-            init();
-        }
+        // Check if already logged in
+        window.onload = () => {
+            const savedId = localStorage.getItem('active_mess_id');
+            if (savedId) startSession(savedId);
+        };
 
-        // Section Toggler
-        function showSection(sectionId) {
-            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
-            document.getElementById(sectionId + '-section').classList.remove('hidden');
-            
-            // UI Active State
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-nav'));
-            const pcBtn = document.getElementById('pc-' + sectionId);
-            if(pcBtn) pcBtn.classList.add('active-nav');
+        function toggleAuthMode(mode) {
+            authMode = mode;
+            document.getElementById('confirmPassContainer').classList.toggle('hidden', mode === 'login');
+            document.getElementById('authActionBtn').innerText = mode === 'login' ? "প্রবেশ করুন" : "অ্যাকাউন্ট তৈরি করুন";
+            document.getElementById('loginTab').className = mode === 'login' ? "flex-1 py-3 text-sm font-bold rounded-xl bg-white text-indigo-600 shadow-sm" : "flex-1 py-3 text-sm font-bold rounded-xl text-gray-500";
+            document.getElementById('registerTab').className = mode === 'register' ? "flex-1 py-3 text-sm font-bold rounded-xl bg-white text-indigo-600 shadow-sm" : "flex-1 py-3 text-sm font-bold rounded-xl text-gray-500";
         }
 
         async function handleAuth() {
             const id = document.getElementById('messId').value.trim().toLowerCase();
             const pass = document.getElementById('adminPass').value;
-            if(!id || !pass) return;
+            const confirmPass = document.getElementById('confirmPass').value;
 
-            const snapshot = await db.ref('user_accounts/' + id).once('value');
-            if(snapshot.exists()) {
-                if(snapshot.val().pass === pass) startSession(id);
-                else showError("ভুল পাসওয়ার্ড");
+            if (!id || !pass) return showError("সবগুলো ঘর পূরণ করুন");
+
+            if (authMode === 'login') {
+                const snapshot = await db.ref('user_accounts/' + id).once('value');
+                if (snapshot.exists() && snapshot.val().pass === pass) startSession(id);
+                else showError("ভুল আইডি অথবা পাসওয়ার্ড!");
             } else {
-                await db.ref('user_accounts/' + id).set({ pass });
+                if (pass !== confirmPass) return showError("পাসওয়ার্ড মিলেনি!");
+                const snapshot = await db.ref('user_accounts/' + id).once('value');
+                if (snapshot.exists()) return showError("এই আইডিটি ইতিমধ্যে ব্যবহৃত!");
+                await db.ref('user_accounts/' + id).set({ pass: pass });
                 startSession(id);
             }
         }
 
         function startSession(id) {
+            currentMessId = id;
             localStorage.setItem('active_mess_id', id);
-            location.reload();
+            document.getElementById('loginOverlay').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('hidden');
+            document.getElementById('displayMessId').innerText = id;
+            init();
         }
 
         function init() {
             document.getElementById('mealDate').valueAsDate = new Date();
-            db.ref('mess_storage/' + currentMessId).on('value', snap => {
-                const data = snap.val();
-                if(data) {
+            db.ref('mess_storage/' + currentMessId).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
                     localData = {
                         members: data.members || [],
                         market: data.market || [],
@@ -273,192 +285,213 @@
         }
 
         function refreshUI() {
-            renderMembers();
-            renderSummary();
-            renderMeals();
-            renderMarket();
+            renderMembersList();
             renderDeposits();
+            renderMarket();
             renderOthers();
-            updateSelects();
+            renderMealEntry();
+            renderSummary();
+            updateDropdowns();
         }
 
-        function updateSelects() {
-            const options = localData.members.map(m => `<option value="${m}">${m}</option>`).join('');
-            ['depositMemberSelect', 'marketMemberSelect'].forEach(id => {
-                document.getElementById(id).innerHTML = options;
-            });
+        function updateDropdowns() {
+            const html = localData.members.map(m => `<option value="${m}">${m}</option>`).join('');
+            document.getElementById('depositMemberSelect').innerHTML = html;
+            document.getElementById('marketMemberSelect').innerHTML = html;
         }
 
-        function renderMembers() {
-            document.getElementById('membersDisplayList').innerHTML = localData.members.map(m => `
-                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-50">
-                    <span class="font-bold text-slate-700">${m}</span>
-                    <button onclick="deleteMember('${m}')" class="text-red-300 hover:text-red-500"><i class="fas fa-trash"></i></button>
-                </div>
-            `).join('');
+        function showSection(id) {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id + '-section').classList.remove('hidden');
+            
+            // Sidebar buttons active state
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-nav'));
+            const pcBtn = document.getElementById('pc-' + id);
+            if(pcBtn) pcBtn.classList.add('active-nav');
         }
 
+        function saveData() { db.ref('mess_storage/' + currentMessId).set(localData); }
+        function showError(m) { const el = document.getElementById('errorMsg'); el.innerText = m; el.classList.remove('hidden'); }
+        function logout() { if(confirm("লগআউট করতে চান?")) { localStorage.clear(); location.reload(); } }
+
+        // Core Functions
         function addMember() {
             const name = document.getElementById('newMemberName').value.trim();
             if(name && !localData.members.includes(name)) {
                 localData.members.push(name);
-                save();
                 document.getElementById('newMemberName').value = "";
+                saveData();
             }
         }
 
         function deleteMember(name) {
-            if(confirm("সব ডাটা মুছে যাবে। ডিলিট করবেন?")) {
+            if(confirm(`${name}-কে ডিলিট করলে সকল তথ্য মুছে যাবে। নিশ্চিত?`)) {
                 localData.members = localData.members.filter(m => m !== name);
-                save();
+                saveData();
             }
         }
 
-        // Summary Logic
-        function renderSummary() {
-            let totalMarket = localData.market.reduce((s, i) => s + i.amount, 0);
-            let totalOthers = localData.otherExpenses.reduce((s, i) => s + i.amount, 0);
-            let totalMeals = 0;
-            
-            let stats = {};
-            localData.members.forEach(m => stats[m] = { meals: 0, deposit: 0, market: 0 });
-
-            for(let date in localData.dailyMeals) {
-                for(let m in localData.dailyMeals[date]) {
-                    if(stats[m]) {
-                        stats[m].meals += localData.dailyMeals[date][m];
-                        totalMeals += localData.dailyMeals[date][m];
-                    }
-                }
-            }
-
-            localData.deposits.forEach(d => { if(stats[d.name]) stats[d.name].deposit += d.amount; });
-            localData.market.forEach(mk => { if(stats[mk.name]) stats[mk.name].market += mk.amount; });
-
-            const mealRate = totalMeals > 0 ? (totalMarket / totalMeals) : 0;
-            const otherPerHead = localData.members.length > 0 ? (totalOthers / localData.members.length) : 0;
-
-            document.getElementById('totalMarketDisplay').innerText = totalMarket.toFixed(0);
-            document.getElementById('totalMealDisplay').innerText = totalMeals.toFixed(1);
-            document.getElementById('mealRateDisplay').innerText = mealRate.toFixed(2);
-            document.getElementById('totalOthersDisplay').innerText = totalOthers.toFixed(0);
-
-            document.getElementById('personalSummaryTable').innerHTML = localData.members.map(m => {
-                const mealCost = stats[m].meals * mealRate;
-                const totalCost = mealCost + otherPerHead;
-                const balance = stats[m].deposit - totalCost;
-                return `
-                    <tr>
-                        <td class="p-5 font-bold">${m}</td>
-                        <td class="p-5 text-center">${stats[m].meals}</td>
-                        <td class="p-5 text-center text-teal-600 font-bold">৳${stats[m].deposit}</td>
-                        <td class="p-5 text-center text-red-500">৳${totalCost.toFixed(0)}</td>
-                        <td class="p-5 text-center font-black ${balance >= 0 ? 'text-green-600' : 'text-red-600'}">
-                            ৳${balance.toFixed(0)}
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        // Meal Entry
-        function renderMeals() {
-            const date = document.getElementById('mealDate').value;
-            const daily = localData.dailyMeals[date] || {};
-            document.getElementById('mealEntryList').innerHTML = localData.members.map(m => `
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+        function renderMembersList() {
+            document.getElementById('membersDisplayList').innerHTML = localData.members.map(m => `
+                <div class="bg-white p-5 rounded-2xl flex justify-between items-center shadow-sm border">
                     <span class="font-bold">${m}</span>
-                    <input type="number" step="0.5" value="${daily[m] || 0}" onchange="updateMealVal('${m}', this.value)" class="w-20 p-2 rounded-lg text-center font-bold">
+                    <button onclick="deleteMember('${m}')" class="text-red-400 hover:text-red-600"><i class="fas fa-trash-alt"></i></button>
                 </div>
             `).join('');
         }
 
-        function updateMealVal(m, val) {
-            const date = document.getElementById('mealDate').value;
-            if(!localData.dailyMeals[date]) localData.dailyMeals[date] = {};
-            localData.dailyMeals[date][m] = parseFloat(val) || 0;
-        }
-
-        function saveDailyMeals() { save(); alert("সেভ হয়েছে"); }
-
-        // Generic Functions
         function addDeposit() {
             const name = document.getElementById('depositMemberSelect').value;
             const amount = parseFloat(document.getElementById('depositAmount').value);
-            if(name && amount > 0) {
-                localData.deposits.push({ name, amount, id: Date.now() });
-                save();
+            if(amount > 0 && name) {
+                localData.deposits.push({ name, amount, date: new Date().toLocaleDateString() });
                 document.getElementById('depositAmount').value = "";
+                saveData();
             }
         }
 
         function renderDeposits() {
-            document.getElementById('depositList').innerHTML = localData.deposits.slice().reverse().map(d => `
-                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-l-4 border-teal-500">
-                    <div><p class="text-xs text-gray-400">${d.name}</p><p class="font-bold">৳${d.amount}</p></div>
-                    <button onclick="deleteItem('deposits', ${d.id})" class="text-gray-300"><i class="fas fa-times"></i></button>
-                </div>
-            `).join('');
+            document.getElementById('depositTableBody').innerHTML = localData.deposits.map((item, idx) => `
+                <tr>
+                    <td class="p-4">${item.name}</td>
+                    <td class="p-4 font-bold text-teal-600">৳${item.amount}</td>
+                    <td class="p-4 text-right"><button onclick="deleteItem('deposits', ${idx})" class="text-red-300"><i class="fas fa-times"></i></button></td>
+                </tr>
+            `).reverse().join('');
         }
 
         function addMarket() {
             const name = document.getElementById('marketMemberSelect').value;
             const amount = parseFloat(document.getElementById('marketAmount').value);
-            if(name && amount > 0) {
-                localData.market.push({ name, amount, id: Date.now() });
-                save();
+            if(amount > 0 && name) {
+                localData.market.push({ name, amount, date: new Date().toLocaleDateString() });
                 document.getElementById('marketAmount').value = "";
+                saveData();
             }
         }
 
         function renderMarket() {
-            document.getElementById('marketList').innerHTML = localData.market.slice().reverse().map(m => `
-                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-l-4 border-yellow-500">
-                    <div><p class="text-xs text-gray-400">${m.name}</p><p class="font-bold">৳${m.amount}</p></div>
-                    <button onclick="deleteItem('market', ${m.id})" class="text-gray-300"><i class="fas fa-times"></i></button>
+            document.getElementById('marketTableBody').innerHTML = localData.market.map((item, idx) => `
+                <tr>
+                    <td class="p-4">${item.name}</td>
+                    <td class="p-4 text-center text-gray-400 text-xs">${item.date}</td>
+                    <td class="p-4 font-bold">৳${item.amount}</td>
+                    <td class="p-4 text-right"><button onclick="deleteItem('market', ${idx})" class="text-red-300"><i class="fas fa-trash"></i></button></td>
+                </tr>
+            `).reverse().join('');
+        }
+
+        function renderMealEntry() {
+            const date = document.getElementById('mealDate').value;
+            const dailyData = localData.dailyMeals[date] || {};
+            document.getElementById('mealEntryList').innerHTML = localData.members.map(m => `
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+                    <span class="font-bold">${m}</span>
+                    <input type="number" step="0.5" data-member="${m}" value="${dailyData[m] || 0}" class="w-20 p-2 text-center border rounded-xl font-bold">
                 </div>
             `).join('');
+        }
+
+        function saveDailyMeals() {
+            const date = document.getElementById('mealDate').value;
+            const entries = {};
+            document.querySelectorAll('#mealEntryList input').forEach(inp => {
+                entries[inp.dataset.member] = parseFloat(inp.value) || 0;
+            });
+            localData.dailyMeals[date] = entries;
+            saveData();
+            alert("সেভ করা হয়েছে!");
         }
 
         function addOtherExpense() {
             const name = document.getElementById('expName').value;
             const amount = parseFloat(document.getElementById('expAmount').value);
             if(name && amount > 0) {
-                localData.otherExpenses.push({ name, amount, id: Date.now() });
-                save();
+                localData.otherExpenses.push({ name, amount });
                 document.getElementById('expName').value = "";
                 document.getElementById('expAmount').value = "";
+                saveData();
             }
         }
 
         function renderOthers() {
-            document.getElementById('othersList').innerHTML = localData.otherExpenses.slice().reverse().map(e => `
-                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-l-4 border-red-500">
-                    <div><p class="text-xs text-gray-400">${e.name}</p><p class="font-bold text-red-600">৳${e.amount}</p></div>
-                    <button onclick="deleteItem('otherExpenses', ${e.id})" class="text-gray-300"><i class="fas fa-times"></i></button>
+            document.getElementById('othersList').innerHTML = localData.otherExpenses.map((ex, idx) => `
+                <div class="bg-white p-5 rounded-2xl flex justify-between items-center shadow-sm border-l-4 border-red-500">
+                    <div><p class="font-bold">${ex.name}</p><p class="text-red-500 font-black">৳${ex.amount}</p></div>
+                    <button onclick="deleteItem('otherExpenses', ${idx})" class="text-gray-300 hover:text-red-500"><i class="fas fa-times-circle text-xl"></i></button>
                 </div>
-            `).join('');
+            `).reverse().join('');
         }
 
-        function deleteItem(type, id) {
-            localData[type] = localData[type].filter(i => i.id !== id);
-            save();
+        function deleteItem(type, idx) {
+            if(confirm("মুছে ফেলতে চান?")) {
+                localData[type].splice(idx, 1);
+                saveData();
+            }
         }
 
-        function save() { db.ref('mess_storage/' + currentMessId).set(localData); }
-        function logout() { localStorage.clear(); location.reload(); }
-        function showError(m) { const e = document.getElementById('errorMsg'); e.innerText = m; e.classList.remove('hidden'); }
+        function renderSummary() {
+            let totalMarket = localData.market.reduce((s, i) => s + i.amount, 0);
+            let totalOthers = localData.otherExpenses.reduce((s, i) => s + i.amount, 0);
+            let totalMeals = 0;
+            let stats = {};
+
+            localData.members.forEach(m => stats[m] = { meals: 0, deposit: 0, cost: 0 });
+
+            for(let d in localData.dailyMeals) {
+                for(let m in localData.dailyMeals[d]) {
+                    if(stats[m]) {
+                        stats[m].meals += localData.dailyMeals[d][m];
+                        totalMeals += localData.dailyMeals[d][m];
+                    }
+                }
+            }
+
+            localData.deposits.forEach(d => { if(stats[d.name]) stats[d.name].deposit += d.amount; });
+            
+            const mealRate = totalMeals > 0 ? (totalMarket / totalMeals) : 0;
+            const perHeadOthers = localData.members.length > 0 ? (totalOthers / localData.members.length) : 0;
+
+            document.getElementById('totalMarketDisplay').innerText = totalMarket;
+            document.getElementById('totalMealDisplay').innerText = totalMeals.toFixed(1);
+            document.getElementById('mealRateDisplay').innerText = mealRate.toFixed(2);
+            document.getElementById('totalOthersDisplay').innerText = totalOthers;
+
+            document.getElementById('personalSummaryTable').innerHTML = localData.members.map(m => {
+                const mealCost = stats[m].meals * mealRate;
+                const totalCost = mealCost + perHeadOthers;
+                const balance = stats[m].deposit - totalCost;
+                return `
+                    <tr>
+                        <td class="p-4 font-bold">${m}</td>
+                        <td class="p-4 text-center">${stats[m].meals}</td>
+                        <td class="p-4 text-center text-teal-600">৳${stats[m].deposit}</td>
+                        <td class="p-4 text-center text-red-500">৳${totalCost.toFixed(1)}</td>
+                        <td class="p-4 text-center font-black ${balance >= 0 ? 'text-green-600' : 'text-red-600'}">৳${balance.toFixed(1)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
 
         function downloadPDF() {
             const element = document.getElementById('pdf-area');
+            const months = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
+            const date = new Date();
+            
+            document.getElementById('pdf-month-title').innerText = `${months[date.getMonth()]} ${date.getFullYear()}`;
+            document.getElementById('pdf-header').classList.remove('hidden');
+            
             const opt = {
-                margin: 10,
+                margin: 5,
                 filename: `Report_${currentMessId}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
-            html2pdf().set(opt).from(element).save();
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                document.getElementById('pdf-header').classList.add('hidden');
+            });
         }
     </script>
 </body>
