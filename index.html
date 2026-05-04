@@ -6,6 +6,10 @@
     <title>হিসেবের খাতা - মেস ম্যানেজমেন্ট</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
         body { font-family: 'Hind Siliguri', sans-serif; }
@@ -75,9 +79,14 @@
             
             <!-- SUMMARY SECTION -->
             <section id="summary-section" class="section-content">
-                <header class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-800">মেস সামারি</h2>
-                    <p class="text-gray-500">চলতি মাসের আর্থিক হিসাব</p>
+                <header class="mb-8 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">মেস সামারি</h2>
+                        <p class="text-gray-500">চলতি মাসের আর্থিক হিসাব</p>
+                    </div>
+                    <button onclick="downloadPDF()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-indigo-700 transition">
+                        <i class="fas fa-file-pdf mr-2"></i>PDF ডাউনলোড
+                    </button>
                 </header>
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -100,7 +109,7 @@
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
-                    <table class="w-full text-left text-sm md:text-base min-w-[600px]">
+                    <table id="summaryTable" class="w-full text-left text-sm md:text-base min-w-[600px]">
                         <thead class="bg-slate-800 text-white">
                             <tr>
                                 <th class="p-4">নাম</th>
@@ -115,7 +124,7 @@
                 </div>
             </section>
 
-            <!-- MEALS SECTION -->
+            <!-- Other sections remain same as your code... -->
             <section id="meals-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">প্রতিদিনের মিল এন্ট্রি</h2>
                 <div class="bg-white rounded-2xl shadow-sm p-6 max-w-2xl">
@@ -125,7 +134,6 @@
                 </div>
             </section>
 
-            <!-- DEPOSIT SECTION -->
             <section id="deposit-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">টাকা জমা (Deposit)</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-2xl">
@@ -143,7 +151,6 @@
                 </div>
             </section>
 
-            <!-- MARKET SECTION -->
             <section id="market-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">বাজারের খরচ</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-2xl">
@@ -161,7 +168,6 @@
                 </div>
             </section>
 
-            <!-- OTHERS SECTION -->
             <section id="others-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">অন্যান্য ব্যয়</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-2xl">
@@ -174,7 +180,6 @@
                 <div id="othersList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </section>
 
-            <!-- MEMBERS SECTION -->
             <section id="members-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">মেম্বার ম্যানেজমেন্ট</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-lg">
@@ -188,12 +193,14 @@
         </main>
 
         <!-- Mobile Nav -->
-        <nav id="mobileNav" class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-3 z-50 shadow-2xl">
+        <nav id="mobileNav" class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center p-2 z-50 shadow-2xl">
             <button onclick="showSection('summary')" id="m-summary" class="nav-m-btn flex flex-col items-center text-indigo-600"><i class="fas fa-home"></i><span class="text-[10px]">হোম</span></button>
             <button onclick="showSection('meals')" id="m-meals" class="nav-m-btn flex flex-col items-center text-gray-400"><i class="fas fa-utensils"></i><span class="text-[10px]">মিল</span></button>
             <button onclick="showSection('deposit')" id="m-deposit" class="nav-m-btn flex flex-col items-center text-gray-400"><i class="fas fa-hand-holding-usd"></i><span class="text-[10px]">জমা</span></button>
             <button onclick="showSection('market')" id="m-market" class="nav-m-btn flex flex-col items-center text-gray-400"><i class="fas fa-shopping-basket"></i><span class="text-[10px]">বাজার</span></button>
             <button onclick="showSection('members')" id="m-members" class="nav-m-btn flex flex-col items-center text-gray-400"><i class="fas fa-users"></i><span class="text-[10px]">মেম্বার</span></button>
+            <!-- Logout Button for Mobile -->
+            <button onclick="logout()" class="flex flex-col items-center text-red-500"><i class="fas fa-sign-out-alt"></i><span class="text-[10px]">আউট</span></button>
         </nav>
     </div>
 
@@ -224,6 +231,63 @@
             deposits: []
         };
 
+        // PDF Generation Function
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(18);
+            doc.text("Hiseber Khata - Monthly Report", 14, 20);
+            doc.setFontSize(12);
+            doc.text(`Mess ID: ${currentMessId}`, 14, 30);
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 37);
+
+            const summaryHeaders = [["Name", "Total Meal", "Deposit", "Cost", "Balance"]];
+            const summaryData = localData.members.map(m => {
+                let stats = getMemberStats(m);
+                return [m, stats.meals, `Tk ${stats.deposit}`, `Tk ${stats.cost}`, `${stats.balance}`];
+            });
+
+            doc.autoTable({
+                startY: 45,
+                head: summaryHeaders,
+                body: summaryData,
+                theme: 'striped',
+                headStyles: { fillColor: [79, 70, 229] }
+            });
+
+            doc.save(`Mess_Report_${currentMessId}.pdf`);
+        }
+
+        // Helper to get stats for PDF
+        function getMemberStats(m) {
+            let totalMarket = localData.market.reduce((sum, item) => sum + item.amount, 0);
+            let totalOthers = localData.otherExpenses.reduce((sum, item) => sum + item.amount, 0);
+            let totalMeals = 0;
+            let mMeals = 0;
+            let mDeposit = 0;
+
+            for(let date in localData.dailyMeals) {
+                for(let member in localData.dailyMeals[date]) {
+                    totalMeals += localData.dailyMeals[date][member];
+                    if(member === m) mMeals += localData.dailyMeals[date][member];
+                }
+            }
+            localData.deposits.forEach(d => { if(d.name === m) mDeposit += d.amount; });
+
+            let mealRate = totalMeals > 0 ? (totalMarket / totalMeals) : 0;
+            let fixedCost = localData.members.length > 0 ? (totalOthers / localData.members.length) : 0;
+            let mCost = (mMeals * mealRate) + fixedCost;
+
+            return {
+                meals: mMeals,
+                deposit: mDeposit,
+                cost: mCost.toFixed(2),
+                balance: (mDeposit - mCost).toFixed(2)
+            };
+        }
+
+        // --- Existing functions from your code below ---
         function toggleAuthMode(mode) {
             authMode = mode;
             const loginTab = document.getElementById('loginTab');
@@ -231,9 +295,7 @@
             const confirmContainer = document.getElementById('confirmPassContainer');
             const actionBtn = document.getElementById('authActionBtn');
             const errorEl = document.getElementById('errorMsg');
-
             errorEl.classList.add('hidden');
-
             if (mode === 'login') {
                 loginTab.className = "flex-1 py-3 text-sm font-bold rounded-xl transition-all bg-white text-indigo-600 shadow-sm";
                 registerTab.className = "flex-1 py-3 text-sm font-bold rounded-xl transition-all text-gray-500";
@@ -251,9 +313,7 @@
             const id = document.getElementById('messId').value.trim().toLowerCase();
             const pass = document.getElementById('adminPass').value;
             const confirmPass = document.getElementById('confirmPass').value;
-
             if (!id || !pass) return showError("আইডি এবং পাসওয়ার্ড দিন");
-
             if (authMode === 'login') {
                 const snapshot = await db.ref('user_accounts/' + id).once('value');
                 if (snapshot.exists() && snapshot.val().pass === pass) {
@@ -266,7 +326,6 @@
                 if (pass !== confirmPass) return showError("পাসওয়ার্ড দুটি মিলেনি!");
                 const snapshot = await db.ref('user_accounts/' + id).once('value');
                 if (snapshot.exists()) return showError("এই আইডিটি ইতিমধ্যে ব্যবহৃত হয়েছে");
-
                 await db.ref('user_accounts/' + id).set({ pass: pass });
                 alert("সাফল্যের সাথে মেস আইডি খোলা হয়েছে!");
                 startSession(id);
@@ -299,19 +358,9 @@
             });
         }
 
-        function saveData() {
-            db.ref('mess_storage/' + currentMessId).set(localData);
-        }
-
-        function showError(m) {
-            const el = document.getElementById('errorMsg');
-            el.innerText = m; el.classList.remove('hidden');
-        }
-
-        function logout() {
-            localStorage.clear();
-            location.reload();
-        }
+        function saveData() { db.ref('mess_storage/' + currentMessId).set(localData); }
+        function showError(m) { const el = document.getElementById('errorMsg'); el.innerText = m; el.classList.remove('hidden'); }
+        function logout() { localStorage.clear(); location.reload(); }
 
         function refreshUI() {
             renderSummary();
@@ -320,7 +369,6 @@
             renderOthers();
             renderDeposits();
             renderMembersList();
-            
             const selects = ['marketMemberSelect', 'depositMemberSelect'];
             selects.forEach(s => {
                 const el = document.getElementById(s);
@@ -418,7 +466,7 @@
             });
             localData.dailyMeals[date] = dailyEntries;
             saveData();
-            alert("মিল ডাটা সেভ করা হয়েছে!");
+            alert("মিল ডাটা সেভ করা হয়েছে!");
         }
 
         function addOtherExpense() {
@@ -453,9 +501,7 @@
             let totalOthers = localData.otherExpenses.reduce((sum, item) => sum + item.amount, 0);
             let totalMeals = 0;
             let memberStats = {};
-
             localData.members.forEach(m => { memberStats[m] = { meals: 0, deposit: 0 }; });
-
             for(let date in localData.dailyMeals) {
                 for(let m in localData.dailyMeals[date]) {
                     if(memberStats[m]) {
@@ -464,9 +510,7 @@
                     }
                 }
             }
-
             localData.deposits.forEach(d => { if(memberStats[d.name]) memberStats[d.name].deposit += d.amount; });
-
             let mealRate = totalMeals > 0 ? (totalMarket / totalMeals) : 0;
             let fixedCostPerHead = localData.members.length > 0 ? (totalOthers / localData.members.length) : 0;
 
@@ -495,11 +539,9 @@
         function showSection(id) {
             document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
             document.getElementById(id + '-section').classList.remove('hidden');
-            
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-nav'));
             const pcBtn = document.getElementById('pc-' + id);
             if(pcBtn) pcBtn.classList.add('active-nav');
-            
             document.querySelectorAll('.nav-m-btn').forEach(b => {
                 b.classList.replace('text-indigo-600', 'text-gray-400');
             });
@@ -511,7 +553,6 @@
             const savedId = localStorage.getItem('active_mess_id');
             if(savedId) startSession(savedId);
         };
-
         document.getElementById('mealDate').addEventListener('change', renderMealEntry);
     </script>
 </body>
