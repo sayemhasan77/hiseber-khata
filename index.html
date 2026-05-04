@@ -9,7 +9,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
         body { font-family: 'Hind Siliguri', sans-serif; }
-        .nav-active { background-color: #1e293b; border-left: 4px solid #fbbf24; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen pb-20 md:pb-0">
@@ -43,7 +42,7 @@
         <!-- Main Content -->
         <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-10">
             
-            <!-- 1. SUMMARY SECTION -->
+            <!-- SUMMARY SECTION -->
             <section id="summary-section" class="section-content">
                 <header class="mb-8">
                     <h2 class="text-2xl font-bold text-gray-800">মেস সামারি</h2>
@@ -85,24 +84,24 @@
                 </div>
             </section>
 
-            <!-- 2. MEAL ENTRY SECTION -->
+            <!-- MEAL ENTRY SECTION -->
             <section id="meals-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">প্রতিদিনের মিল এন্ট্রি</h2>
                 <div class="bg-white rounded-2xl shadow-sm p-6 max-w-2xl">
                     <input type="date" id="mealDate" class="w-full border p-3 rounded-xl mb-6 bg-gray-50 outline-none">
                     <div id="mealEntryList" class="space-y-4"></div>
-                    <button onclick="saveDailyMeals()" class="mt-8 w-full bg-indigo-600 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-indigo-700 transition">আজকের মিল সেভ করুন</button>
+                    <button onclick="saveDailyMeals()" class="mt-8 w-full bg-indigo-600 text-white py-4 rounded-xl font-bold shadow-lg">আজকের মিল সেভ করুন</button>
                 </div>
             </section>
 
-            <!-- 3. DEPOSIT SECTION -->
+            <!-- DEPOSIT SECTION -->
             <section id="deposit-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">টাকা জমা (Deposit)</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-2xl">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <select id="depositMemberSelect" class="border p-3 rounded-xl outline-none"></select>
                         <input type="number" id="depositAmount" placeholder="টাকার পরিমাণ" class="border p-3 rounded-xl outline-none">
-                        <button onclick="addDeposit()" class="bg-teal-600 text-white p-3 rounded-xl font-bold hover:bg-teal-700">জমা দিন</button>
+                        <button onclick="addDeposit()" class="bg-teal-600 text-white p-3 rounded-xl font-bold">জমা দিন</button>
                     </div>
                 </div>
                 <div class="bg-white rounded-2xl shadow-sm overflow-hidden max-w-2xl">
@@ -113,14 +112,14 @@
                 </div>
             </section>
 
-            <!-- 4. MARKET SECTION -->
+            <!-- MARKET SECTION -->
             <section id="market-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">বাজারের খরচ</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-2xl">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <select id="marketMemberSelect" class="border p-3 rounded-xl outline-none"></select>
                         <input type="number" id="marketAmount" placeholder="বাজারের টাকা" class="border p-3 rounded-xl outline-none">
-                        <button onclick="addMarket()" class="bg-yellow-500 text-white p-3 rounded-xl font-bold hover:bg-yellow-600">অ্যাড করুন</button>
+                        <button onclick="addMarket()" class="bg-yellow-500 text-white p-3 rounded-xl font-bold">অ্যাড করুন</button>
                     </div>
                 </div>
                 <div class="bg-white rounded-2xl shadow-sm overflow-hidden max-w-2xl">
@@ -131,31 +130,30 @@
                 </div>
             </section>
 
-            <!-- 5. OTHERS SECTION -->
+            <!-- OTHERS SECTION -->
             <section id="others-section" class="section-content hidden">
-                <h2 class="text-2xl font-bold mb-6">অন্যান্য ব্যয় (সবাই ভাগ করে দিবে)</h2>
+                <h2 class="text-2xl font-bold mb-6">অন্যান্য ব্যয়</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-2xl">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <input type="text" id="expName" placeholder="খরচের নাম" class="border p-3 rounded-xl outline-none">
                         <input type="number" id="expAmount" placeholder="টাকা" class="border p-3 rounded-xl outline-none">
-                        <button onclick="addOtherExpense()" class="bg-red-500 text-white p-3 rounded-xl font-bold hover:bg-red-600">যোগ করুন</button>
+                        <button onclick="addOtherExpense()" class="bg-red-500 text-white p-3 rounded-xl font-bold">যোগ করুন</button>
                     </div>
                 </div>
                 <div id="othersList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </section>
 
-            <!-- 6. MEMBER MANAGEMENT -->
+            <!-- MEMBER MANAGEMENT -->
             <section id="members-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">মেম্বার ম্যানেজমেন্ট</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-lg">
                     <div class="flex gap-4">
                         <input type="text" id="newMemberName" placeholder="নাম লিখুন" class="flex-1 border p-3 rounded-xl outline-none">
-                        <button onclick="addMember()" class="bg-purple-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-purple-700">অ্যাড</button>
+                        <button onclick="addMember()" class="bg-purple-600 text-white px-6 py-3 rounded-xl font-bold">অ্যাড</button>
                     </div>
                 </div>
                 <div id="membersDisplayList" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
             </section>
-
         </main>
 
         <!-- Mobile Nav -->
@@ -168,9 +166,30 @@
         </nav>
     </div>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <script>
-        let data = JSON.parse(localStorage.getItem('hiseberKhata_v3')) || {
-            members: ["আরিফ", "তানজিল"],
+        // আপনার Firebase কনফিগারেশন
+        const firebaseConfig = {
+            apiKey: "AIzaSyBB02NmJpHi0WS8wUv_JwGZ_scsRRNx7GA",
+            authDomain: "hiseber-khata-743e5.firebaseapp.com",
+            databaseURL: "https://hiseber-khata-743e5-default-rtdb.firebaseio.com",
+            projectId: "hiseber-khata-743e5",
+            storageBucket: "hiseber-khata-743e5.firebasestorage.app",
+            messagingSenderId: "167663336335",
+            appId: "1:167663336335:web:02482be99a86f90bffa9fa",
+            measurementId: "G-TK0WR2VMD9"
+        };
+
+        // Firebase ইনিশিয়ালাইজেশন
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const dataRef = db.ref('mess_data');
+
+        let localData = {
+            members: [],
             market: [],
             dailyMeals: {},
             otherExpenses: [],
@@ -189,11 +208,24 @@
 
         function init() {
             document.getElementById('mealDate').valueAsDate = new Date();
-            refreshUI();
+            
+            // Firebase থেকে ডাটা লিসেন করা (Real-time)
+            dataRef.on('value', (snapshot) => {
+                const cloudData = snapshot.val();
+                if (cloudData) {
+                    localData = cloudData;
+                    // নিশ্চিত করা যেন অ্যারেগুলো ঠিক থাকে (ফায়ারবেজ খালি থাকলে অবজেক্ট পাঠাতে পারে)
+                    if(!Array.isArray(localData.members)) localData.members = [];
+                    if(!Array.isArray(localData.market)) localData.market = [];
+                    if(!Array.isArray(localData.otherExpenses)) localData.otherExpenses = [];
+                    if(!Array.isArray(localData.deposits)) localData.deposits = [];
+                    if(!localData.dailyMeals) localData.dailyMeals = {};
+                    refreshUI();
+                }
+            });
         }
 
         function refreshUI() {
-            localStorage.setItem('hiseberKhata_v3', JSON.stringify(data));
             renderSummary();
             renderMealEntry();
             renderMarket();
@@ -203,38 +235,34 @@
             
             const selects = ['marketMemberSelect', 'depositMemberSelect'];
             selects.forEach(s => {
-                document.getElementById(s).innerHTML = data.members.map(m => `<option value="${m}">${m}</option>`).join('');
+                const el = document.getElementById(s);
+                if(el) el.innerHTML = localData.members.map(m => `<option value="${m}">${m}</option>`).join('');
             });
         }
 
-        function showSection(id) {
-            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
-            document.getElementById(id + '-section').classList.remove('hidden');
-            
-            // UI Button styling
-            document.querySelectorAll('nav button').forEach(b => b.classList.replace('text-indigo-600', 'text-gray-400'));
-            if(event) event.currentTarget.classList.replace('text-gray-400', 'text-indigo-600');
+        function saveData() {
+            dataRef.set(localData);
         }
 
         // --- MEMBER LOGIC ---
         function addMember() {
             const name = document.getElementById('newMemberName').value.trim();
-            if(name && !data.members.includes(name)) {
-                data.members.push(name);
+            if(name && !localData.members.includes(name)) {
+                localData.members.push(name);
                 document.getElementById('newMemberName').value = "";
-                refreshUI();
+                saveData();
             }
         }
 
         function deleteMember(name) {
             if(confirm(`${name}-কে কি সত্যিই ডিলিট করবেন?`)) {
-                data.members = data.members.filter(m => m !== name);
-                refreshUI();
+                localData.members = localData.members.filter(m => m !== name);
+                saveData();
             }
         }
 
         function renderMembersList() {
-            document.getElementById('membersDisplayList').innerHTML = data.members.map(m => `
+            document.getElementById('membersDisplayList').innerHTML = localData.members.map(m => `
                 <div class="bg-white p-4 rounded-xl flex justify-between items-center shadow-sm">
                     <span class="font-bold">${m}</span>
                     <button onclick="deleteMember('${m}')" class="text-red-400"><i class="fas fa-trash-alt"></i></button>
@@ -247,18 +275,40 @@
             const name = document.getElementById('depositMemberSelect').value;
             const amount = parseFloat(document.getElementById('depositAmount').value);
             if(amount > 0) {
-                data.deposits.push({ name, amount, date: new Date().toLocaleDateString() });
+                localData.deposits.push({ name, amount, date: new Date().toLocaleDateString() });
                 document.getElementById('depositAmount').value = "";
-                refreshUI();
+                saveData();
             }
         }
 
         function renderDeposits() {
-            document.getElementById('depositTableBody').innerHTML = data.deposits.map((item, idx) => `
+            document.getElementById('depositTableBody').innerHTML = localData.deposits.map((item, idx) => `
                 <tr class="border-b">
                     <td class="p-4">${item.name}</td>
                     <td class="p-4 font-bold text-teal-600">৳${item.amount}</td>
-                    <td class="p-4"><button onclick="data.deposits.splice(${idx}, 1); refreshUI();" class="text-red-400"><i class="fas fa-times"></i></button></td>
+                    <td class="p-4"><button onclick="deleteItem('deposits', ${idx})" class="text-red-400"><i class="fas fa-times"></i></button></td>
+                </tr>
+            `).join('');
+        }
+
+        // --- MARKET LOGIC ---
+        function addMarket() {
+            const name = document.getElementById('marketMemberSelect').value;
+            const amount = parseFloat(document.getElementById('marketAmount').value);
+            if(amount > 0) {
+                localData.market.push({ name, amount, date: new Date().toLocaleDateString() });
+                document.getElementById('marketAmount').value = "";
+                saveData();
+            }
+        }
+
+        function renderMarket() {
+            document.getElementById('marketTableBody').innerHTML = localData.market.map((item, idx) => `
+                <tr class="border-b text-sm">
+                    <td class="p-4">${item.name}</td>
+                    <td class="p-4 text-center text-gray-400">${item.date}</td>
+                    <td class="p-4 font-bold">৳${item.amount}</td>
+                    <td class="p-4 text-center"><button onclick="deleteItem('market', ${idx})" class="text-red-400"><i class="fas fa-trash"></i></button></td>
                 </tr>
             `).join('');
         }
@@ -266,8 +316,8 @@
         // --- MEAL LOGIC ---
         function renderMealEntry() {
             const date = document.getElementById('mealDate').value;
-            const dailyData = data.dailyMeals[date] || {};
-            document.getElementById('mealEntryList').innerHTML = data.members.map(m => `
+            const dailyData = localData.dailyMeals[date] || {};
+            document.getElementById('mealEntryList').innerHTML = localData.members.map(m => `
                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                     <span class="font-medium">${m}</span>
                     <input type="number" step="0.5" data-member="${m}" value="${dailyData[m] || 0}" class="w-20 border rounded-lg p-2 text-center font-bold">
@@ -281,31 +331,9 @@
             document.querySelectorAll('#mealEntryList input').forEach(input => {
                 dailyEntries[input.dataset.member] = parseFloat(input.value) || 0;
             });
-            data.dailyMeals[date] = dailyEntries;
-            alert("মিল সেভ হয়েছে!");
-            refreshUI();
-        }
-
-        // --- MARKET LOGIC ---
-        function addMarket() {
-            const name = document.getElementById('marketMemberSelect').value;
-            const amount = parseFloat(document.getElementById('marketAmount').value);
-            if(amount > 0) {
-                data.market.push({ name, amount, date: new Date().toLocaleDateString() });
-                document.getElementById('marketAmount').value = "";
-                refreshUI();
-            }
-        }
-
-        function renderMarket() {
-            document.getElementById('marketTableBody').innerHTML = data.market.map((item, idx) => `
-                <tr class="border-b text-sm">
-                    <td class="p-4">${item.name}</td>
-                    <td class="p-4 text-center text-gray-400">${item.date}</td>
-                    <td class="p-4 font-bold">৳${item.amount}</td>
-                    <td class="p-4 text-center"><button onclick="data.market.splice(${idx}, 1); refreshUI();" class="text-red-400"><i class="fas fa-trash"></i></button></td>
-                </tr>
-            `).join('');
+            localData.dailyMeals[date] = dailyEntries;
+            saveData();
+            alert("মিল সেভ হয়েছে!");
         }
 
         // --- OTHERS ---
@@ -313,55 +341,59 @@
             const name = document.getElementById('expName').value;
             const amount = parseFloat(document.getElementById('expAmount').value);
             if(name && amount) {
-                data.otherExpenses.push({ name, amount });
+                localData.otherExpenses.push({ name, amount });
                 document.getElementById('expName').value = "";
                 document.getElementById('expAmount').value = "";
-                refreshUI();
+                saveData();
             }
         }
 
         function renderOthers() {
-            document.getElementById('othersList').innerHTML = data.otherExpenses.map((ex, idx) => `
+            document.getElementById('othersList').innerHTML = localData.otherExpenses.map((ex, idx) => `
                 <div class="bg-white p-4 rounded-xl flex justify-between items-center shadow-sm border-l-4 border-red-500">
                     <div><p class="font-bold">${ex.name}</p><p class="text-red-500 font-bold">৳ ${ex.amount}</p></div>
-                    <button onclick="data.otherExpenses.splice(${idx}, 1); refreshUI();" class="text-gray-300"><i class="fas fa-times-circle"></i></button>
+                    <button onclick="deleteItem('otherExpenses', ${idx})" class="text-gray-300"><i class="fas fa-times-circle"></i></button>
                 </div>
             `).join('');
         }
 
+        // Helper to delete items
+        function deleteItem(type, index) {
+            localData[type].splice(index, 1);
+            saveData();
+        }
+
         // --- FINAL CALCULATION ---
         function renderSummary() {
-            let totalMarket = data.market.reduce((sum, item) => sum + item.amount, 0);
-            let totalOthers = data.otherExpenses.reduce((sum, item) => sum + item.amount, 0);
+            let totalMarket = localData.market.reduce((sum, item) => sum + item.amount, 0);
+            let totalOthers = localData.otherExpenses.reduce((sum, item) => sum + item.amount, 0);
             let totalMeals = 0;
             let memberStats = {};
 
-            data.members.forEach(m => {
-                memberStats[m] = { meals: 0, deposit: 0, market: 0 };
+            localData.members.forEach(m => {
+                memberStats[m] = { meals: 0, deposit: 0 };
             });
 
-            // Calculate Meals
-            for(let date in data.dailyMeals) {
-                for(let m in data.dailyMeals[date]) {
+            for(let date in localData.dailyMeals) {
+                for(let m in localData.dailyMeals[date]) {
                     if(memberStats[m]) {
-                        memberStats[m].meals += data.dailyMeals[date][m];
-                        totalMeals += data.dailyMeals[date][m];
+                        memberStats[m].meals += localData.dailyMeals[date][m];
+                        totalMeals += localData.dailyMeals[date][m];
                     }
                 }
             }
 
-            // Calculate Deposits
-            data.deposits.forEach(d => { if(memberStats[d.name]) memberStats[d.name].deposit += d.amount; });
+            localData.deposits.forEach(d => { if(memberStats[d.name]) memberStats[d.name].deposit += d.amount; });
 
             let mealRate = totalMeals > 0 ? (totalMarket / totalMeals) : 0;
-            let fixedCostPerHead = data.members.length > 0 ? (totalOthers / data.members.length) : 0;
+            let fixedCostPerHead = localData.members.length > 0 ? (totalOthers / localData.members.length) : 0;
 
             document.getElementById('totalMarketDisplay').innerText = totalMarket;
             document.getElementById('totalMealDisplay').innerText = totalMeals.toFixed(1);
             document.getElementById('mealRateDisplay').innerText = mealRate.toFixed(2);
             document.getElementById('totalOthersDisplay').innerText = totalOthers;
 
-            document.getElementById('personalSummaryTable').innerHTML = data.members.map(m => {
+            document.getElementById('personalSummaryTable').innerHTML = localData.members.map(m => {
                 let mCost = (memberStats[m].meals * mealRate) + fixedCostPerHead;
                 let mBalance = memberStats[m].deposit - mCost;
                 return `
@@ -376,6 +408,15 @@
                     </tr>
                 `;
             }).join('');
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id + '-section').classList.remove('hidden');
+            
+            // Mobile Nav update
+            document.querySelectorAll('nav button').forEach(b => b.classList.replace('text-indigo-600', 'text-gray-400'));
+            if(window.event) window.event.currentTarget.classList.replace('text-gray-400', 'text-indigo-600');
         }
 
         function logout() { location.reload(); }
