@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>হিসেবের খাতা - মেস ম্যানেজমেন্ট</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
+        body { font-family: 'Hind Siliguri', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <!-- Login Overlay (Password: 1234) -->
+    <div id="loginOverlay" class="fixed inset-0 bg-indigo-900 z-50 flex flex-col items-center justify-center">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-80">
+            <h2 class="text-2xl font-bold text-center mb-6 text-indigo-800">অ্যাডমিন লগইন</h2>
+            <input type="password" id="adminPass" placeholder="পাসওয়ার্ড লিখুন" class="w-full border p-3 rounded-lg mb-4 text-center">
+            <button onclick="checkLogin()" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition">প্রবেশ করুন</button>
+            <p id="errorMsg" class="text-red-500 text-sm mt-3 text-center hidden">ভুল পাসওয়ার্ড!</p>
+        </div>
+    </div>
+
+    <!-- Main Dashboard (Hidden initially) -->
+    <div id="mainDashboard" class="hidden flex h-screen overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside class="w-64 bg-slate-900 text-white p-5 space-y-6 hidden md:block">
+            <h1 class="text-2xl font-black text-yellow-400 border-b border-slate-700 pb-4">হিসেবের খাতা</h1>
+            <nav class="space-y-2">
+                <button onclick="showSection('summary')" class="w-full text-left p-3 hover:bg-slate-800 rounded-lg"><i class="fas fa-chart-pie mr-2 text-blue-400"></i> সারাংশ</button>
+                <button onclick="showSection('meals')" class="w-full text-left p-3 hover:bg-slate-800 rounded-lg"><i class="fas fa-utensils mr-2 text-green-400"></i> মিল এন্ট্রি</button>
+                <button onclick="showSection('market')" class="w-full text-left p-3 hover:bg-slate-800 rounded-lg"><i class="fas fa-shopping-basket mr-2 text-yellow-400"></i> বাজার খরচ</button>
+                <button onclick="showSection('others')" class="w-full text-left p-3 hover:bg-slate-800 rounded-lg"><i class="fas fa-file-invoice-dollar mr-2 text-red-400"></i> অন্যান্য ব্যয়</button>
+            </nav>
+            <button onclick="logout()" class="mt-20 text-gray-400 hover:text-white"><i class="fas fa-sign-out-alt mr-2"></i> লগআউট</button>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-8">
+            
+            <!-- SUMMARY SECTION -->
+            <section id="summary-section" class="section-content">
+                <h2 class="text-2xl font-bold mb-6">বর্তমান অবস্থা</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-500">
+                        <p class="text-gray-500">মোট বাজার খরচ</p>
+                        <h3 class="text-3xl font-bold">৳ <span id="totalMarketDisplay">0</span></h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-green-500">
+                        <p class="text-gray-500">মোট মিল সংখ্যা</p>
+                        <h3 class="text-3xl font-bold"><span id="totalMealDisplay">0</span> টি</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-yellow-500">
+                        <p class="text-gray-500">মিল রেট</p>
+                        <h3 class="text-3xl font-bold">৳ <span id="mealRateDisplay">0</span></h3>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MEAL ENTRY SECTION -->
+            <section id="meals-section" class="section-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">প্রতিদিনের মিল এন্ট্রি</h2>
+                    <input type="date" id="mealDate" class="border p-2 rounded-lg bg-white shadow-sm">
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <div id="memberList" class="space-y-4">
+                        <!-- Members will be added here via JS -->
+                    </div>
+                    <button onclick="saveMeals()" class="mt-6 w-full bg-green-600 text-white py-3 rounded-lg font-bold shadow-lg hover:bg-green-700">হিসাব সেভ করুন</button>
+                </div>
+            </section>
+
+            <!-- MARKET SECTION -->
+            <section id="market-section" class="section-content hidden">
+                <h2 class="text-2xl font-bold mb-6">বাজার খরচের হিসাব</h2>
+                <div class="bg-white p-6 rounded-xl shadow-md mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input type="text" id="marketMember" placeholder="মেম্বারের নাম" class="border p-3 rounded-lg">
+                        <input type="number" id="marketAmount" placeholder="টাকার পরিমাণ" class="border p-3 rounded-lg">
+                        <button onclick="addMarket()" class="bg-indigo-600 text-white p-3 rounded-lg font-bold hover:bg-indigo-700">+ অ্যাড করুন</button>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-100">
+                            <tr><th class="p-4">নাম</th><th class="p-4">টাকা</th><th class="p-4">অ্যাকশন</th></tr>
+                        </thead>
+                        <tbody id="marketTable"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // Default Data
+        let members = ["আরিফ", "তানজিল", "সোহেল", "রিমন"];
+        let password = "1234"; // আপনার ইচ্ছা মতো পাসওয়ার্ড পরিবর্তন করুন
+
+        // Logic for Authentication
+        function checkLogin() {
+            const input = document.getElementById('adminPass').value;
+            if(input === password) {
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('mainDashboard').classList.remove('hidden');
+                init();
+            } else {
+                document.getElementById('errorMsg').classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            location.reload();
+        }
+
+        // Section Toggler
+        function showSection(id) {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id + '-section').classList.remove('hidden');
+        }
+
+        // App Logic
+        let storage = JSON.parse(localStorage.getItem('hiseberKhata')) || { market: [], meals: {} };
+
+        function init() {
+            renderMembers();
+            renderMarket();
+            updateSummary();
+            // Set current date
+            document.getElementById('mealDate').valueAsDate = new Date();
+        }
+
+        function renderMembers() {
+            const container = document.getElementById('memberList');
+            container.innerHTML = members.map(m => `
+                <div class="flex items-center justify-between border-b pb-3">
+                    <span class="text-lg font-medium">${m}</span>
+                    <div class="flex items-center gap-4">
+                        <input type="number" step="0.5" data-member="${m}" value="0" class="meal-input w-20 border p-2 rounded text-center font-bold">
+                        <span class="text-gray-400 italic">টি মিল</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addMarket() {
+            const name = document.getElementById('marketMember').value;
+            const amount = parseFloat(document.getElementById('marketAmount').value);
+            if(name && amount) {
+                storage.market.push({ name, amount, date: new Date().toLocaleDateString() });
+                saveAndRefresh();
+            }
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('hiseberKhata', JSON.stringify(storage));
+            renderMarket();
+            updateSummary();
+        }
+
+        function renderMarket() {
+            const table = document.getElementById('marketTable');
+            table.innerHTML = storage.market.map((item, index) => `
+                <tr class="border-b">
+                    <td class="p-4">${item.name}</td>
+                    <td class="p-4 font-bold text-green-600">৳ ${item.amount}</td>
+                    <td class="p-4"><button onclick="deleteMarket(${index})" class="text-red-500"><i class="fas fa-trash"></i></button></td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteMarket(idx) {
+            storage.market.splice(idx, 1);
+            saveAndRefresh();
+        }
+
+        function updateSummary() {
+            const totalMarket = storage.market.reduce((sum, item) => sum + item.amount, 0);
+            // Example Meal Count Logic (You can expand this to save daily meals in storage)
+            const totalMeals = 120; // Example
+            document.getElementById('totalMarketDisplay').innerText = totalMarket;
+            document.getElementById('totalMealDisplay').innerText = totalMeals;
+            document.getElementById('mealRateDisplay').innerText = totalMeals > 0 ? (totalMarket / totalMeals).toFixed(2) : 0;
+        }
+
+        function saveMeals() {
+            alert('আজকের মিল সফলভাবে সেভ করা হয়েছে!');
+            // Here you can add logic to push these inputs into storage.meals
+        }
+    </script>
+</body>
+</html>
