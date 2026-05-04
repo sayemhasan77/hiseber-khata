@@ -18,9 +18,11 @@
             -webkit-text-fill-color: transparent;
         }
         .nav-btn:hover { background-color: rgba(79, 70, 229, 0.1); color: #4f46e5; }
-        .active-nav { background-color: rgba(79, 70, 229, 0.1); color: #4f46e5; font-weight: bold; }
+        .active-nav { background-color: rgba(79, 70, 229, 0.1); color: #4f46e5 !important; font-weight: bold; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .section-content { transition: all 0.3s ease-in-out; }
+        /* মোবাইল নেভিগেশন অ্যাক্টিভ স্টাইল */
+        .mobile-active { color: #4f46e5 !important; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen pb-20 md:pb-0">
@@ -69,7 +71,7 @@
         </aside>
 
         <!-- Main Content Area -->
-        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-10">
+        <main id="mainContent" class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-10">
             
             <!-- Summary -->
             <section id="summary-section" class="section-content">
@@ -145,7 +147,7 @@
                 <div class="bg-white p-6 rounded-3xl mb-8 max-w-2xl shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4">
                     <select id="depositMemberSelect" class="border p-4 rounded-2xl bg-gray-50"></select>
                     <input type="number" id="depositAmount" placeholder="টাকার পরিমাণ" class="border p-4 rounded-2xl bg-gray-50">
-                    <button onclick="addDeposit()" class="bg-teal-600 text-white rounded-2xl font-bold">জমা দিন</button>
+                    <button onclick="addDeposit()" class="bg-teal-600 text-white rounded-2xl font-bold p-4">জমা দিন</button>
                 </div>
                 <div class="bg-white rounded-3xl shadow-sm overflow-hidden max-w-2xl">
                     <table class="w-full text-left">
@@ -161,7 +163,7 @@
                 <div class="bg-white p-6 rounded-3xl mb-8 max-w-2xl shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4">
                     <select id="marketMemberSelect" class="border p-4 rounded-2xl bg-gray-50"></select>
                     <input type="number" id="marketAmount" placeholder="বাজার খরচ" class="border p-4 rounded-2xl bg-gray-50">
-                    <button onclick="addMarket()" class="bg-yellow-500 text-white rounded-2xl font-bold">অ্যাড</button>
+                    <button onclick="addMarket()" class="bg-yellow-500 text-white rounded-2xl font-bold p-4">অ্যাড</button>
                 </div>
                 <div class="bg-white rounded-3xl shadow-sm overflow-hidden max-w-2xl">
                     <table class="w-full text-left">
@@ -173,7 +175,7 @@
 
             <!-- Others Section -->
             <section id="others-section" class="section-content hidden">
-                <h2 class="text-2xl font-bold mb-6">অন্যান্য ব্যয়</h2>
+                <h2 class="text-2xl font-bold mb-6">অন্যান্য ব্যয়</h2>
                 <div class="bg-white p-6 rounded-3xl mb-8 max-w-2xl shadow-sm flex gap-4">
                     <input type="text" id="expName" placeholder="খরচের নাম" class="flex-1 border p-4 rounded-2xl bg-gray-50">
                     <input type="number" id="expAmount" placeholder="টাকা" class="w-32 border p-4 rounded-2xl bg-gray-50">
@@ -194,12 +196,22 @@
         </main>
 
         <!-- Mobile Nav -->
-        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-4 z-50">
-            <button onclick="showSection('summary')" class="flex flex-col items-center text-indigo-600"><i class="fas fa-home"></i><span class="text-[10px]">হোম</span></button>
-            <button onclick="showSection('meals')" class="flex flex-col items-center text-gray-400"><i class="fas fa-utensils"></i><span class="text-[10px]">মিল</span></button>
-            <button onclick="showSection('deposit')" class="flex flex-col items-center text-gray-400"><i class="fas fa-hand-holding-usd"></i><span class="text-[10px]">জমা</span></button>
-            <button onclick="showSection('market')" class="flex flex-col items-center text-gray-400"><i class="fas fa-shopping-basket"></i><span class="text-[10px]">বাজার</span></button>
-            <button onclick="showSection('members')" class="flex flex-col items-center text-gray-400"><i class="fas fa-users"></i><span class="text-[10px]">মেম্বার</span></button>
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-4 z-50 shadow-lg">
+            <button onclick="showSection('summary')" id="mob-summary" class="mob-nav-btn flex flex-col items-center text-indigo-600">
+                <i class="fas fa-home"></i><span class="text-[10px]">হোম</span>
+            </button>
+            <button onclick="showSection('meals')" id="mob-meals" class="mob-nav-btn flex flex-col items-center text-gray-400">
+                <i class="fas fa-utensils"></i><span class="text-[10px]">মিল</span>
+            </button>
+            <button onclick="showSection('deposit')" id="mob-deposit" class="mob-nav-btn flex flex-col items-center text-gray-400">
+                <i class="fas fa-hand-holding-usd"></i><span class="text-[10px]">জমা</span>
+            </button>
+            <button onclick="showSection('market')" id="mob-market" class="mob-nav-btn flex flex-col items-center text-gray-400">
+                <i class="fas fa-shopping-basket"></i><span class="text-[10px]">বাজার</span>
+            </button>
+            <button onclick="showSection('members')" id="mob-members" class="mob-nav-btn flex flex-col items-center text-gray-400">
+                <i class="fas fa-users"></i><span class="text-[10px]">মেম্বার</span>
+            </button>
         </nav>
     </div>
 
@@ -224,7 +236,6 @@
         let authMode = 'login';
         let localData = { members: [], market: [], dailyMeals: {}, otherExpenses: [], deposits: [] };
 
-        // Check if already logged in
         window.onload = () => {
             const savedId = localStorage.getItem('active_mess_id');
             if (savedId) startSession(savedId);
@@ -301,20 +312,34 @@
         }
 
         function showSection(id) {
+            // সেকশন পরিবর্তন
             document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
             document.getElementById(id + '-section').classList.remove('hidden');
             
-            // Sidebar buttons active state
+            // পিসি নেভিগেশন একটিভ স্টেট
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-nav'));
             const pcBtn = document.getElementById('pc-' + id);
             if(pcBtn) pcBtn.classList.add('active-nav');
+
+            // মোবাইল নেভিগেশন একটিভ স্টেট (নতুন আপডেট)
+            document.querySelectorAll('.mob-nav-btn').forEach(btn => {
+                btn.classList.remove('text-indigo-600');
+                btn.classList.add('text-gray-400');
+            });
+            const mobBtn = document.getElementById('mob-' + id);
+            if(mobBtn) {
+                mobBtn.classList.remove('text-gray-400');
+                mobBtn.classList.add('text-indigo-600');
+            }
+
+            // পেজ স্ক্রল টপ করা
+            document.getElementById('mainContent').scrollTop = 0;
         }
 
         function saveData() { db.ref('mess_storage/' + currentMessId).set(localData); }
         function showError(m) { const el = document.getElementById('errorMsg'); el.innerText = m; el.classList.remove('hidden'); }
         function logout() { if(confirm("লগআউট করতে চান?")) { localStorage.clear(); location.reload(); } }
 
-        // Core Functions
         function addMember() {
             const name = document.getElementById('newMemberName').value.trim();
             if(name && !localData.members.includes(name)) {
@@ -355,7 +380,7 @@
                 <tr>
                     <td class="p-4">${item.name}</td>
                     <td class="p-4 font-bold text-teal-600">৳${item.amount}</td>
-                    <td class="p-4 text-right"><button onclick="deleteItem('deposits', ${idx})" class="text-red-300"><i class="fas fa-times"></i></button></td>
+                    <td class="p-4 text-right"><button onclick="deleteItem('deposits', ${localData.deposits.length - 1 - idx})" class="text-red-300"><i class="fas fa-times"></i></button></td>
                 </tr>
             `).reverse().join('');
         }
@@ -376,7 +401,7 @@
                     <td class="p-4">${item.name}</td>
                     <td class="p-4 text-center text-gray-400 text-xs">${item.date}</td>
                     <td class="p-4 font-bold">৳${item.amount}</td>
-                    <td class="p-4 text-right"><button onclick="deleteItem('market', ${idx})" class="text-red-300"><i class="fas fa-trash"></i></button></td>
+                    <td class="p-4 text-right"><button onclick="deleteItem('market', ${localData.market.length - 1 - idx})" class="text-red-300"><i class="fas fa-trash"></i></button></td>
                 </tr>
             `).reverse().join('');
         }
@@ -400,7 +425,7 @@
             });
             localData.dailyMeals[date] = entries;
             saveData();
-            alert("সেভ করা হয়েছে!");
+            alert("সেভ করা হয়েছে!");
         }
 
         function addOtherExpense() {
@@ -418,7 +443,7 @@
             document.getElementById('othersList').innerHTML = localData.otherExpenses.map((ex, idx) => `
                 <div class="bg-white p-5 rounded-2xl flex justify-between items-center shadow-sm border-l-4 border-red-500">
                     <div><p class="font-bold">${ex.name}</p><p class="text-red-500 font-black">৳${ex.amount}</p></div>
-                    <button onclick="deleteItem('otherExpenses', ${idx})" class="text-gray-300 hover:text-red-500"><i class="fas fa-times-circle text-xl"></i></button>
+                    <button onclick="deleteItem('otherExpenses', ${localData.otherExpenses.length - 1 - idx})" class="text-gray-300 hover:text-red-500"><i class="fas fa-times-circle text-xl"></i></button>
                 </div>
             `).reverse().join('');
         }
@@ -458,7 +483,7 @@
             document.getElementById('totalOthersDisplay').innerText = totalOthers;
 
             document.getElementById('personalSummaryTable').innerHTML = localData.members.map(m => {
-                const mealCost = stats[m].meals * mealRate;
+                const mealCost = (stats[m].meals || 0) * mealRate;
                 const totalCost = mealCost + perHeadOthers;
                 const balance = stats[m].deposit - totalCost;
                 return `
