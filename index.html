@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>হিসেবের খাতা - স্মার্ট মেস ম্যানেজমেন্ট</title>
+    <title>হিসেবের খাতা - মেস ম্যানেজমেন্ট</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -13,45 +13,38 @@
         body { font-family: 'Hind Siliguri', sans-serif; }
         .premium-logo {
             font-family: 'Anek Bangla', sans-serif;
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .nav-btn:hover { background-color: rgba(99, 102, 241, 0.1); color: #6366f1; }
-        .active-nav { background-color: rgba(99, 102, 241, 0.1); color: #6366f1; font-weight: bold; border-right: 4px solid #6366f1; }
+        .nav-btn:hover { background-color: rgba(79, 70, 229, 0.1); color: #4f46e5; }
+        .active-nav { background-color: rgba(79, 70, 229, 0.1); color: #4f46e5; font-weight: bold; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); }
+        .section-content { transition: all 0.3s ease-in-out; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen pb-20 md:pb-0">
+<body class="bg-gray-100 min-h-screen pb-20 md:pb-0">
 
     <!-- Auth Overlay -->
-    <div id="loginOverlay" class="fixed inset-0 bg-slate-900 z-[100] flex flex-col items-center justify-center p-4">
-        <div class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-2xl w-full max-w-md border border-slate-100">
-            <div class="text-center mb-10">
-                <h2 class="text-5xl font-extrabold premium-logo mb-3">হিসেবের খাতা</h2>
-                <p class="text-slate-500 text-sm font-medium">মেস ম্যানেজমেন্ট এখন আপনার হাতের মুঠোয়</p>
+    <div id="loginOverlay" class="fixed inset-0 bg-indigo-900 z-[100] flex flex-col items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md">
+            <div class="text-center mb-8">
+                <h2 class="text-5xl font-extrabold premium-logo mb-2">হিসেবের খাতা</h2>
+                <p class="text-gray-500 text-sm">আপনার মেস ম্যানেজমেন্ট এখন আরও সহজ</p>
             </div>
-            <div class="flex bg-slate-100 p-1.5 rounded-2xl mb-8">
+            <div class="flex bg-gray-100 p-1.5 rounded-2xl mb-8">
                 <button id="loginTab" onclick="toggleAuthMode('login')" class="flex-1 py-3 text-sm font-bold rounded-xl transition-all bg-white text-indigo-600 shadow-sm">লগইন</button>
-                <button id="registerTab" onclick="toggleAuthMode('register')" class="flex-1 py-3 text-sm font-bold rounded-xl transition-all text-gray-500">নতুন মেস আইডি</button>
+                <button id="registerTab" onclick="toggleAuthMode('register')" class="flex-1 py-3 text-sm font-bold rounded-xl transition-all text-gray-500">নতুন অ্যাকাউন্ট</button>
             </div>
-            <div class="space-y-4">
-                <div class="relative">
-                    <i class="fas fa-hashtag absolute left-4 top-4 text-slate-400"></i>
-                    <input type="text" id="messId" placeholder="মেস আইডি (mess2026)" class="w-full border-2 border-slate-50 p-4 pl-12 rounded-2xl focus:border-indigo-500 outline-none transition-all bg-slate-50">
+            <div class="space-y-5">
+                <input type="text" id="messId" placeholder="মেস আইডি (যেমন: mess2026)" class="w-full border-2 border-gray-100 p-4 rounded-2xl focus:border-indigo-500 outline-none transition-all">
+                <input type="password" id="adminPass" placeholder="পাসওয়ার্ড" class="w-full border-2 border-gray-100 p-4 rounded-2xl focus:border-indigo-500 outline-none transition-all">
+                <div id="confirmPassContainer" class="hidden">
+                    <input type="password" id="confirmPass" placeholder="পাসওয়ার্ড নিশ্চিত করুন" class="w-full border-2 border-gray-100 p-4 rounded-2xl focus:border-indigo-500 outline-none transition-all">
                 </div>
-                <div class="relative">
-                    <i class="fas fa-lock absolute left-4 top-4 text-slate-400"></i>
-                    <input type="password" id="adminPass" placeholder="পাসওয়ার্ড" class="w-full border-2 border-slate-50 p-4 pl-12 rounded-2xl focus:border-indigo-500 outline-none transition-all bg-slate-50">
-                </div>
-                <div id="confirmPassContainer" class="hidden relative">
-                    <i class="fas fa-shield-alt absolute left-4 top-4 text-slate-400"></i>
-                    <input type="password" id="confirmPass" placeholder="পাসওয়ার্ড নিশ্চিত করুন" class="w-full border-2 border-slate-50 p-4 pl-12 rounded-2xl focus:border-indigo-500 outline-none transition-all bg-slate-50">
-                </div>
-                <button id="authActionBtn" onclick="handleAuth()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all active:scale-[0.98]">প্রবেশ করুন</button>
+                <button id="authActionBtn" onclick="handleAuth()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:bg-indigo-700 shadow-xl transition-all">প্রবেশ করুন</button>
             </div>
-            <p id="errorMsg" class="text-red-500 text-xs mt-6 text-center bg-red-50 p-3 rounded-xl hidden font-medium border border-red-100"></p>
+            <p id="errorMsg" class="text-red-500 text-xs mt-4 text-center bg-red-50 p-2 rounded-lg hidden font-medium"></p>
         </div>
     </div>
 
@@ -59,204 +52,154 @@
     <div id="mainDashboard" class="hidden flex flex-col md:flex-row h-screen overflow-hidden">
         
         <!-- PC Sidebar -->
-        <aside class="hidden md:flex w-80 bg-white border-r border-slate-200 flex-col p-8 space-y-8">
-            <div class="py-2">
-                <h1 class="text-3xl font-black premium-logo">হিসেবের খাতা</h1>
+        <aside class="hidden md:flex w-72 bg-slate-900 text-white flex-col p-6 space-y-6">
+            <h1 class="text-3xl font-extrabold premium-logo text-center py-4 border-b border-slate-800">হিসেবের খাতা</h1>
+            <div class="text-xs text-slate-400 bg-slate-800 p-3 rounded-xl">
+                <i class="fas fa-id-badge mr-2"></i>ID: <span id="displayMessId" class="text-indigo-400 font-bold"></span>
             </div>
-            
-            <div class="bg-indigo-50 p-4 rounded-2xl border border-indigo-100">
-                <p class="text-[10px] uppercase font-bold text-indigo-400 mb-1">Active Mess ID</p>
-                <div class="flex items-center justify-between">
-                    <span id="displayMessId" class="text-indigo-900 font-bold text-lg"></span>
-                    <i class="fas fa-check-circle text-indigo-500"></i>
-                </div>
-            </div>
-
-            <nav class="space-y-1 flex-1">
-                <button onclick="showSection('summary')" id="pc-summary" class="nav-btn w-full text-left p-4 rounded-xl active-nav flex items-center"><i class="fas fa-th-large mr-3 w-5"></i>ড্যাশবোর্ড</button>
-                <button onclick="showSection('meals')" id="pc-meals" class="nav-btn w-full text-left p-4 rounded-xl flex items-center"><i class="fas fa-calendar-check mr-3 w-5"></i>প্রতিদিনের মিল</button>
-                <button onclick="showSection('deposit')" id="pc-deposit" class="nav-btn w-full text-left p-4 rounded-xl flex items-center"><i class="fas fa-wallet mr-3 w-5"></i>টাকা জমা</button>
-                <button onclick="showSection('market')" id="pc-market" class="nav-btn w-full text-left p-4 rounded-xl flex items-center"><i class="fas fa-shopping-cart mr-3 w-5"></i>বাজার লিস্ট</button>
-                <button onclick="showSection('others')" id="pc-others" class="nav-btn w-full text-left p-4 rounded-xl flex items-center"><i class="fas fa-receipt mr-3 w-5"></i>অন্যান্য খরচ</button>
-                <button onclick="showSection('members')" id="pc-members" class="nav-btn w-full text-left p-4 rounded-xl flex items-center"><i class="fas fa-users-cog mr-3 w-5"></i>মেম্বার সেটিংস</button>
+            <nav class="space-y-2 flex-1">
+                <button onclick="showSection('summary')" id="pc-summary" class="nav-btn w-full text-left p-3.5 rounded-xl active-nav"><i class="fas fa-home mr-3 text-blue-400"></i>ড্যাশবোর্ড</button>
+                <button onclick="showSection('meals')" id="pc-meals" class="nav-btn w-full text-left p-3.5 rounded-xl"><i class="fas fa-utensils mr-3 text-green-400"></i>মিল এন্ট্রি</button>
+                <button onclick="showSection('deposit')" id="pc-deposit" class="nav-btn w-full text-left p-3.5 rounded-xl"><i class="fas fa-hand-holding-usd mr-3 text-teal-400"></i>জমা (Deposit)</button>
+                <button onclick="showSection('market')" id="pc-market" class="nav-btn w-full text-left p-3.5 rounded-xl"><i class="fas fa-shopping-basket mr-3 text-yellow-400"></i>বাজার লিস্ট</button>
+                <button onclick="showSection('others')" id="pc-others" class="nav-btn w-full text-left p-3.5 rounded-xl"><i class="fas fa-wallet mr-3 text-red-400"></i>অন্যান্য ব্যয়</button>
+                <button onclick="showSection('members')" id="pc-members" class="nav-btn w-full text-left p-3.5 rounded-xl"><i class="fas fa-user-plus mr-3 text-purple-400"></i>মেম্বার ম্যানেজমেন্ট</button>
             </nav>
-
-            <button onclick="logout()" class="flex items-center justify-center gap-2 bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-500 p-4 rounded-2xl transition-all font-bold text-sm">
-                <i class="fas fa-power-off"></i> লগআউট
-            </button>
+            <button onclick="logout()" class="text-gray-400 hover:text-red-400 transition text-sm pt-4 border-t border-slate-800"><i class="fas fa-sign-out-alt mr-2"></i>লগআউট</button>
         </aside>
 
         <!-- Main Content Area -->
-        <main class="flex-1 overflow-y-auto p-4 md:p-12">
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-10">
             
-            <!-- Summary Section -->
-            <section id="summary-section" class="section-content max-w-6xl mx-auto">
-                <header class="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <!-- Summary -->
+            <section id="summary-section" class="section-content">
+                <header class="mb-8 flex justify-between items-center">
                     <div>
-                        <h2 class="text-3xl font-black text-slate-800">মাসের হিসাব</h2>
-                        <p class="text-slate-500 font-medium">আপনার মেসের বর্তমান আর্থিক অবস্থা</p>
+                        <h2 class="text-2xl font-bold text-gray-800">মেস সামারি</h2>
+                        <p class="text-gray-500">চলতি মাসের আর্থিক রিপোর্ট</p>
                     </div>
-                    <div class="flex gap-3">
-                        <button onclick="downloadPDF()" class="bg-white border border-slate-200 text-slate-700 px-6 py-3 rounded-2xl text-sm font-bold flex items-center hover:bg-slate-50 transition card-shadow">
-                            <i class="fas fa-download mr-2 text-indigo-500"></i> রিপোর্ট PDF
-                        </button>
-                        <button onclick="logout()" class="md:hidden bg-red-50 text-red-600 w-12 h-12 flex items-center justify-center rounded-2xl border border-red-100">
-                            <i class="fas fa-power-off"></i>
-                        </button>
+                    <div class="flex gap-2">
+                        <button onclick="logout()" class="md:hidden bg-red-50 text-red-600 w-11 h-11 flex items-center justify-center rounded-xl border border-red-100"><i class="fas fa-sign-out-alt"></i></button>
+                        <button onclick="downloadPDF()" class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center"><i class="fas fa-file-pdf mr-2"></i>PDF</button>
                     </div>
                 </header>
 
-                <div id="pdf-area">
-                    <!-- Stats Grid -->
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
-                        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 card-shadow">
-                            <div class="w-10 h-10 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center mb-4"><i class="fas fa-shopping-bag"></i></div>
-                            <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">মোট বাজার</p>
-                            <h3 class="text-2xl font-black text-slate-800">৳ <span id="totalMarketDisplay">0</span></h3>
+                <div id="pdf-area" class="bg-white rounded-3xl shadow-sm p-6">
+                    <div id="pdf-header" class="hidden text-center py-6 border-b mb-6">
+                        <h1 class="text-3xl font-bold text-indigo-600">হিসেবের খাতা রিপোর্ট</h1>
+                        <p id="pdf-month-title" class="text-gray-600"></p>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100">
+                            <p class="text-blue-500 text-xs font-bold uppercase">মোট বাজার</p>
+                            <h3 class="text-xl font-black text-blue-900">৳ <span id="totalMarketDisplay">0</span></h3>
                         </div>
-                        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 card-shadow">
-                            <div class="w-10 h-10 bg-green-50 text-green-500 rounded-xl flex items-center justify-center mb-4"><i class="fas fa-utensils"></i></div>
-                            <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">মোট মিল</p>
-                            <h3 class="text-2xl font-black text-slate-800"><span id="totalMealDisplay">0</span></h3>
+                        <div class="bg-green-50 p-5 rounded-2xl border border-green-100">
+                            <p class="text-green-500 text-xs font-bold uppercase">মোট মিল</p>
+                            <h3 class="text-xl font-black text-green-900"><span id="totalMealDisplay">0</span></h3>
                         </div>
-                        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 card-shadow">
-                            <div class="w-10 h-10 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center mb-4"><i class="fas fa-chart-line"></i></div>
-                            <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">মিল রেট</p>
-                            <h3 class="text-2xl font-black text-slate-800">৳ <span id="mealRateDisplay">0</span></h3>
+                        <div class="bg-orange-50 p-5 rounded-2xl border border-orange-100">
+                            <p class="text-orange-500 text-xs font-bold uppercase">মিল রেট</p>
+                            <h3 class="text-xl font-black text-orange-900">৳ <span id="mealRateDisplay">0</span></h3>
                         </div>
-                        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 card-shadow">
-                            <div class="w-10 h-10 bg-red-50 text-red-500 rounded-xl flex items-center justify-center mb-4"><i class="fas fa-plus-circle"></i></div>
-                            <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">অন্যান্য খরচ</p>
-                            <h3 class="text-2xl font-black text-slate-800">৳ <span id="totalOthersDisplay">0</span></h3>
+                        <div class="bg-red-50 p-5 rounded-2xl border border-red-100">
+                            <p class="text-red-500 text-xs font-bold uppercase">অন্যান্য খরচ</p>
+                            <h3 class="text-xl font-black text-red-900">৳ <span id="totalOthersDisplay">0</span></h3>
                         </div>
                     </div>
 
-                    <!-- Main Table -->
-                    <div class="bg-white rounded-[2.5rem] card-shadow overflow-hidden border border-slate-100">
-                        <div class="p-6 border-b border-slate-50 flex justify-between items-center">
-                            <h4 class="font-bold text-slate-800">সদস্যদের বিস্তারিত হিসাব</h4>
-                            <span class="text-[10px] bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full font-bold">LIVE UPDATE</span>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left">
-                                <thead class="bg-slate-50 text-slate-500 text-[11px] uppercase font-bold tracking-widest">
-                                    <tr>
-                                        <th class="p-6">মেম্বার</th>
-                                        <th class="p-6 text-center">মোট মিল</th>
-                                        <th class="p-6 text-center">জমা</th>
-                                        <th class="p-6 text-center">খরচ</th>
-                                        <th class="p-6 text-center">অবশিষ্ট/পাওনা</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="personalSummaryTable" class="divide-y divide-slate-50"></tbody>
-                            </table>
-                        </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm border-collapse">
+                            <thead class="bg-slate-900 text-white">
+                                <tr>
+                                    <th class="p-4 rounded-tl-xl">নাম</th>
+                                    <th class="p-4 text-center">মিল</th>
+                                    <th class="p-4 text-center">জমা</th>
+                                    <th class="p-4 text-center">খরচ</th>
+                                    <th class="p-4 text-center rounded-tr-xl">ব্যালেন্স</th>
+                                </tr>
+                            </thead>
+                            <tbody id="personalSummaryTable" class="divide-y divide-gray-100"></tbody>
+                        </table>
                     </div>
                 </div>
             </section>
 
-            <!-- Meals Section -->
-            <section id="meals-section" class="section-content hidden max-w-2xl mx-auto">
-                <div class="bg-white rounded-[2.5rem] p-8 md:p-12 card-shadow border border-slate-100">
-                    <h2 class="text-2xl font-black text-slate-800 mb-2 text-center">ডেইলি মিল এন্ট্রি</h2>
-                    <p class="text-slate-400 text-center mb-10 text-sm">প্রতিদিনের মিল সংখ্যা এখানে আপডেট করুন</p>
-                    
-                    <div class="mb-10">
-                        <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-2 ml-2">তারিখ নির্বাচন</label>
-                        <div class="relative">
-                            <i class="fas fa-calendar-day absolute left-5 top-5 text-indigo-500"></i>
-                            <input type="date" id="mealDate" onchange="renderMealEntry()" class="w-full bg-slate-50 border-2 border-slate-50 p-4 pl-14 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold text-slate-700">
-                        </div>
+            <!-- Meal Entry Section -->
+            <section id="meals-section" class="section-content hidden">
+                <h2 class="text-2xl font-bold mb-6">প্রতিদিনের মিল এন্ট্রি</h2>
+                <div class="bg-white rounded-3xl p-8 max-w-xl shadow-sm">
+                    <div class="mb-6">
+                        <label class="text-xs font-bold text-gray-400 uppercase">তারিখ নির্বাচন</label>
+                        <input type="date" id="mealDate" onchange="renderMealEntry()" class="w-full border-2 border-gray-50 p-4 rounded-2xl mt-1 bg-gray-50 outline-none focus:border-indigo-500">
                     </div>
-                    
-                    <div id="mealEntryList" class="space-y-3 mb-10"></div>
-                    
-                    <button onclick="saveDailyMeals()" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-bold shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3">
-                        <i class="fas fa-save"></i> ডেটা সেভ করুন
-                    </button>
+                    <div id="mealEntryList" class="space-y-3"></div>
+                    <button onclick="saveDailyMeals()" class="mt-8 w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition-all">সেভ করুন</button>
                 </div>
             </section>
 
-            <!-- Deposits Section -->
-            <section id="deposit-section" class="section-content hidden max-w-4xl mx-auto">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Form -->
-                    <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100 h-fit">
-                        <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fas fa-plus-circle text-teal-500"></i> নতুন জমা</h3>
-                        <div class="space-y-4">
-                            <select id="depositMemberSelect" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-50 focus:border-teal-500 outline-none font-bold text-slate-700"></select>
-                            <div class="relative">
-                                <span class="absolute left-4 top-4 font-bold text-slate-400">৳</span>
-                                <input type="number" id="depositAmount" placeholder="টাকার পরিমাণ" class="w-full p-4 pl-10 rounded-2xl bg-slate-50 border-2 border-slate-50 focus:border-teal-500 outline-none font-bold">
-                            </div>
-                            <input type="date" id="depositDate" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-50 focus:border-teal-500 outline-none">
-                            <button onclick="addDeposit()" class="w-full bg-teal-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-teal-100 hover:bg-teal-700 transition-all">কনফার্ম জমা</button>
-                        </div>
-                    </div>
-                    <!-- List -->
-                    <div class="bg-white rounded-[2.5rem] card-shadow border border-slate-100 overflow-hidden">
-                        <div class="p-6 bg-slate-50 border-b flex justify-between items-center">
-                            <span class="font-bold text-slate-700">জমার ইতিহাস</span>
-                        </div>
-                        <div class="max-h-[500px] overflow-y-auto">
-                            <table class="w-full text-left">
-                                <tbody id="depositTableBody" class="divide-y divide-slate-50"></tbody>
-                            </table>
-                        </div>
-                    </div>
+            <!-- Deposit Section -->
+            <section id="deposit-section" class="section-content hidden">
+                <h2 class="text-2xl font-bold mb-6">টাকা জমা</h2>
+                <div class="bg-white p-6 rounded-3xl mb-8 max-w-2xl shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <select id="depositMemberSelect" class="border p-4 rounded-2xl bg-gray-50"></select>
+                    <input type="number" id="depositAmount" placeholder="টাকার পরিমাণ" class="border p-4 rounded-2xl bg-gray-50">
+                    <button onclick="addDeposit()" class="bg-teal-600 text-white rounded-2xl font-bold">জমা দিন</button>
+                </div>
+                <div class="bg-white rounded-3xl shadow-sm overflow-hidden max-w-2xl">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 font-bold"><tr><th class="p-4">নাম</th><th class="p-4">টাকা</th><th class="p-4 text-right">একশন</th></tr></thead>
+                        <tbody id="depositTableBody" class="divide-y divide-gray-50"></tbody>
+                    </table>
                 </div>
             </section>
 
-            <!-- Other Sections (Market, Others, Members) remain structurally similar but with enhanced UI -->
             <!-- Market Section -->
-            <section id="market-section" class="section-content hidden max-w-4xl mx-auto">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100 h-fit">
-                        <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fas fa-shopping-basket text-yellow-500"></i> বাজার খরচ</h3>
-                        <div class="space-y-4">
-                            <select id="marketMemberSelect" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-50 focus:border-yellow-500 outline-none font-bold text-slate-700"></select>
-                            <input type="number" id="marketAmount" placeholder="বাজারের পরিমাণ" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-50 focus:border-yellow-500 outline-none font-bold">
-                            <input type="date" id="marketDate" class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-50 focus:border-yellow-500 outline-none">
-                            <button onclick="addMarket()" class="w-full bg-yellow-500 text-white py-4 rounded-2xl font-bold shadow-lg shadow-yellow-100 hover:bg-yellow-600 transition-all">অ্যাড করুন</button>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-[2.5rem] card-shadow border border-slate-100 overflow-hidden">
-                        <div class="p-6 bg-slate-50 border-b font-bold text-slate-700">বাজার লিস্ট</div>
-                        <div class="max-h-[500px] overflow-y-auto"><table class="w-full text-left"><tbody id="marketTableBody" class="divide-y divide-slate-50"></tbody></table></div>
-                    </div>
+            <section id="market-section" class="section-content hidden">
+                <h2 class="text-2xl font-bold mb-6">বাজার খরচ</h2>
+                <div class="bg-white p-6 rounded-3xl mb-8 max-w-2xl shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <select id="marketMemberSelect" class="border p-4 rounded-2xl bg-gray-50"></select>
+                    <input type="number" id="marketAmount" placeholder="বাজার খরচ" class="border p-4 rounded-2xl bg-gray-50">
+                    <button onclick="addMarket()" class="bg-yellow-500 text-white rounded-2xl font-bold">অ্যাড</button>
+                </div>
+                <div class="bg-white rounded-3xl shadow-sm overflow-hidden max-w-2xl">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 font-bold"><tr><th class="p-4">নাম</th><th class="p-4 text-center">তারিখ</th><th class="p-4">টাকা</th><th class="p-4 text-right">ডিলিট</th></tr></thead>
+                        <tbody id="marketTableBody" class="divide-y divide-gray-50"></tbody>
+                    </table>
                 </div>
             </section>
 
             <!-- Others Section -->
-            <section id="others-section" class="section-content hidden max-w-2xl mx-auto">
-                <h2 class="text-2xl font-black mb-6">অতিরিক্ত মেস খরচ</h2>
-                <div class="bg-white p-6 rounded-3xl mb-8 card-shadow flex flex-col md:flex-row gap-4">
-                    <input type="text" id="expName" placeholder="খরচের বিবরণ (যেমন: ডাস্টবিন বিল)" class="flex-1 border-2 border-slate-50 p-4 rounded-2xl bg-slate-50 outline-none focus:border-red-400 font-medium">
-                    <input type="number" id="expAmount" placeholder="টাকা" class="md:w-32 border-2 border-slate-50 p-4 rounded-2xl bg-slate-50 outline-none focus:border-red-400 font-bold">
-                    <button onclick="addOtherExpense()" class="bg-red-500 text-white px-8 py-4 rounded-2xl font-bold hover:bg-red-600 transition-all shadow-lg shadow-red-100">যোগ করুন</button>
+            <section id="others-section" class="section-content hidden">
+                <h2 class="text-2xl font-bold mb-6">অন্যান্য ব্যয়</h2>
+                <div class="bg-white p-6 rounded-3xl mb-8 max-w-2xl shadow-sm flex gap-4">
+                    <input type="text" id="expName" placeholder="খরচের নাম" class="flex-1 border p-4 rounded-2xl bg-gray-50">
+                    <input type="number" id="expAmount" placeholder="টাকা" class="w-32 border p-4 rounded-2xl bg-gray-50">
+                    <button onclick="addOtherExpense()" class="bg-red-500 text-white px-6 rounded-2xl font-bold">যোগ</button>
                 </div>
-                <div id="othersList" class="grid grid-cols-1 gap-4"></div>
+                <div id="othersList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </section>
 
             <!-- Members Section -->
-            <section id="members-section" class="section-content hidden max-w-2xl mx-auto">
-                <h2 class="text-2xl font-black mb-6">মেম্বার সেটিংস</h2>
-                <div class="bg-white p-6 rounded-3xl mb-10 card-shadow flex gap-4">
-                    <input type="text" id="newMemberName" placeholder="মেম্বারের নাম লিখুন" class="flex-1 border-2 border-slate-50 p-4 rounded-2xl bg-slate-50 outline-none focus:border-purple-500 font-bold">
-                    <button onclick="addMember()" class="bg-purple-600 text-white px-8 py-4 rounded-2xl font-bold shadow-lg shadow-purple-100 active:scale-95 transition-all">অ্যাড</button>
+            <section id="members-section" class="section-content hidden">
+                <h2 class="text-2xl font-bold mb-6">মেম্বার ম্যানেজমেন্ট</h2>
+                <div class="bg-white p-6 rounded-3xl mb-8 max-w-lg shadow-sm flex gap-4">
+                    <input type="text" id="newMemberName" placeholder="নতুন মেম্বার নাম" class="flex-1 border p-4 rounded-2xl bg-gray-50">
+                    <button onclick="addMember()" class="bg-purple-600 text-white px-8 py-4 rounded-2xl font-bold">অ্যাড</button>
                 </div>
-                <div id="membersDisplayList" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+                <div id="membersDisplayList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
             </section>
-
         </main>
 
-        <!-- Mobile Bottom Navigation -->
-        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 flex justify-around p-3 z-50 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
-            <button onclick="showSection('summary')" class="flex flex-col items-center gap-1 text-indigo-600 px-4 py-1"><i class="fas fa-home text-lg"></i><span class="text-[9px] font-bold">হোম</span></button>
-            <button onclick="showSection('meals')" class="flex flex-col items-center gap-1 text-slate-400 px-4 py-1"><i class="fas fa-utensils text-lg"></i><span class="text-[9px] font-bold">মিল</span></button>
-            <button onclick="showSection('deposit')" class="flex flex-col items-center gap-1 text-slate-400 px-4 py-1"><i class="fas fa-wallet text-lg"></i><span class="text-[9px] font-bold">জমা</span></button>
-            <button onclick="showSection('market')" class="flex flex-col items-center gap-1 text-slate-400 px-4 py-1"><i class="fas fa-shopping-cart text-lg"></i><span class="text-[9px] font-bold">বাজার</span></button>
-            <button onclick="showSection('members')" class="flex flex-col items-center gap-1 text-slate-400 px-4 py-1"><i class="fas fa-users text-lg"></i><span class="text-[9px] font-bold">মেম্বার</span></button>
+        <!-- Mobile Nav -->
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-4 z-50">
+            <button onclick="showSection('summary')" class="flex flex-col items-center text-indigo-600"><i class="fas fa-home"></i><span class="text-[10px]">হোম</span></button>
+            <button onclick="showSection('meals')" class="flex flex-col items-center text-gray-400"><i class="fas fa-utensils"></i><span class="text-[10px]">মিল</span></button>
+            <button onclick="showSection('deposit')" class="flex flex-col items-center text-gray-400"><i class="fas fa-hand-holding-usd"></i><span class="text-[10px]">জমা</span></button>
+            <button onclick="showSection('market')" class="flex flex-col items-center text-gray-400"><i class="fas fa-shopping-basket"></i><span class="text-[10px]">বাজার</span></button>
+            <button onclick="showSection('members')" class="flex flex-col items-center text-gray-400"><i class="fas fa-users"></i><span class="text-[10px]">মেম্বার</span></button>
         </nav>
     </div>
 
@@ -281,12 +224,10 @@
         let authMode = 'login';
         let localData = { members: [], market: [], dailyMeals: {}, otherExpenses: [], deposits: [] };
 
+        // Check if already logged in
         window.onload = () => {
             const savedId = localStorage.getItem('active_mess_id');
             if (savedId) startSession(savedId);
-            // Default dates
-            document.getElementById('depositDate').valueAsDate = new Date();
-            document.getElementById('marketDate').valueAsDate = new Date();
         };
 
         function toggleAuthMode(mode) {
@@ -302,16 +243,16 @@
             const pass = document.getElementById('adminPass').value;
             const confirmPass = document.getElementById('confirmPass').value;
 
-            if (!id || !pass) return showError("আইডি এবং পাসওয়ার্ড দিন");
+            if (!id || !pass) return showError("সবগুলো ঘর পূরণ করুন");
 
             if (authMode === 'login') {
                 const snapshot = await db.ref('user_accounts/' + id).once('value');
                 if (snapshot.exists() && snapshot.val().pass === pass) startSession(id);
                 else showError("ভুল আইডি অথবা পাসওয়ার্ড!");
             } else {
-                if (pass !== confirmPass) return showError("পাসওয়ার্ড মেলেনি!");
+                if (pass !== confirmPass) return showError("পাসওয়ার্ড মিলেনি!");
                 const snapshot = await db.ref('user_accounts/' + id).once('value');
-                if (snapshot.exists()) return showError("এই আইডিটি আগেই নেয়া হয়েছে!");
+                if (snapshot.exists()) return showError("এই আইডিটি ইতিমধ্যে ব্যবহৃত!");
                 await db.ref('user_accounts/' + id).set({ pass: pass });
                 startSession(id);
             }
@@ -330,13 +271,15 @@
             document.getElementById('mealDate').valueAsDate = new Date();
             db.ref('mess_storage/' + currentMessId).on('value', (snapshot) => {
                 const data = snapshot.val();
-                localData = data ? {
-                    members: data.members || [],
-                    market: data.market || [],
-                    otherExpenses: data.otherExpenses || [],
-                    deposits: data.deposits || [],
-                    dailyMeals: data.dailyMeals || {}
-                } : { members: [], market: [], dailyMeals: {}, otherExpenses: [], deposits: [] };
+                if (data) {
+                    localData = {
+                        members: data.members || [],
+                        market: data.market || [],
+                        otherExpenses: data.otherExpenses || [],
+                        deposits: data.deposits || [],
+                        dailyMeals: data.dailyMeals || {}
+                    };
+                }
                 refreshUI();
             });
         }
@@ -352,9 +295,7 @@
         }
 
         function updateDropdowns() {
-            const html = localData.members.length > 0 ? 
-                localData.members.map(m => `<option value="${m}">${m}</option>`).join('') : 
-                `<option disabled selected>মেম্বার নেই</option>`;
+            const html = localData.members.map(m => `<option value="${m}">${m}</option>`).join('');
             document.getElementById('depositMemberSelect').innerHTML = html;
             document.getElementById('marketMemberSelect').innerHTML = html;
         }
@@ -367,27 +308,24 @@
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-nav'));
             const pcBtn = document.getElementById('pc-' + id);
             if(pcBtn) pcBtn.classList.add('active-nav');
-
-            // Mobile nav icons active state
-            document.querySelectorAll('.md\\:hidden button').forEach(b => b.classList.replace('text-indigo-600', 'text-slate-400'));
         }
 
         function saveData() { db.ref('mess_storage/' + currentMessId).set(localData); }
-        function showError(m) { const el = document.getElementById('errorMsg'); el.innerText = m; el.classList.remove('hidden'); setTimeout(() => el.classList.add('hidden'), 3000); }
+        function showError(m) { const el = document.getElementById('errorMsg'); el.innerText = m; el.classList.remove('hidden'); }
         function logout() { if(confirm("লগআউট করতে চান?")) { localStorage.clear(); location.reload(); } }
 
-        // Logic Functions
+        // Core Functions
         function addMember() {
             const name = document.getElementById('newMemberName').value.trim();
             if(name && !localData.members.includes(name)) {
                 localData.members.push(name);
                 document.getElementById('newMemberName').value = "";
                 saveData();
-            } else { showError("সঠিক নাম দিন বা মেম্বার অলরেডি আছে"); }
+            }
         }
 
         function deleteMember(name) {
-            if(confirm(`${name}-কে রিমুভ করলে তার সকল তথ্য মুছে যাবে। নিশ্চিত?`)) {
+            if(confirm(`${name}-কে ডিলিট করলে সকল তথ্য মুছে যাবে। নিশ্চিত?`)) {
                 localData.members = localData.members.filter(m => m !== name);
                 saveData();
             }
@@ -395,12 +333,9 @@
 
         function renderMembersList() {
             document.getElementById('membersDisplayList').innerHTML = localData.members.map(m => `
-                <div class="bg-white p-5 rounded-2xl flex justify-between items-center card-shadow border border-slate-50">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold">${m[0]}</div>
-                        <span class="font-bold text-slate-700">${m}</span>
-                    </div>
-                    <button onclick="deleteMember('${m}')" class="text-slate-300 hover:text-red-500 transition-all"><i class="fas fa-trash-alt"></i></button>
+                <div class="bg-white p-5 rounded-2xl flex justify-between items-center shadow-sm border">
+                    <span class="font-bold">${m}</span>
+                    <button onclick="deleteMember('${m}')" class="text-red-400 hover:text-red-600"><i class="fas fa-trash-alt"></i></button>
                 </div>
             `).join('');
         }
@@ -408,109 +343,100 @@
         function addDeposit() {
             const name = document.getElementById('depositMemberSelect').value;
             const amount = parseFloat(document.getElementById('depositAmount').value);
-            const date = document.getElementById('depositDate').value;
-            if(amount > 0 && name && date) {
-                localData.deposits.push({ name, amount, date: new Date(date).toLocaleDateString('bn-BD') });
+            if(amount > 0 && name) {
+                localData.deposits.push({ name, amount, date: new Date().toLocaleDateString() });
                 document.getElementById('depositAmount').value = "";
                 saveData();
-            } else { showError("সবগুলো ঘর পূরণ করুন"); }
+            }
         }
 
         function renderDeposits() {
-            document.getElementById('depositTableBody').innerHTML = localData.deposits.slice().reverse().map((item, idx) => `
-                <tr class="hover:bg-slate-50 transition-all">
-                    <td class="p-4 font-bold text-slate-700">${item.name}</td>
-                    <td class="p-4 text-teal-600 font-black">৳${item.amount}</td>
-                    <td class="p-4 text-[10px] text-slate-400 font-medium">${item.date}</td>
-                    <td class="p-4 text-right"><button onclick="deleteItem('deposits', ${localData.deposits.length - 1 - idx})" class="text-slate-200 hover:text-red-400"><i class="fas fa-times-circle"></i></button></td>
+            document.getElementById('depositTableBody').innerHTML = localData.deposits.map((item, idx) => `
+                <tr>
+                    <td class="p-4">${item.name}</td>
+                    <td class="p-4 font-bold text-teal-600">৳${item.amount}</td>
+                    <td class="p-4 text-right"><button onclick="deleteItem('deposits', ${idx})" class="text-red-300"><i class="fas fa-times"></i></button></td>
                 </tr>
-            `).join('');
+            `).reverse().join('');
         }
 
         function addMarket() {
             const name = document.getElementById('marketMemberSelect').value;
             const amount = parseFloat(document.getElementById('marketAmount').value);
-            const date = document.getElementById('marketDate').value;
-            if(amount > 0 && name && date) {
-                localData.market.push({ name, amount, date: new Date(date).toLocaleDateString('bn-BD') });
+            if(amount > 0 && name) {
+                localData.market.push({ name, amount, date: new Date().toLocaleDateString() });
                 document.getElementById('marketAmount').value = "";
                 saveData();
-            } else { showError("সবগুলো ঘর পূরণ করুন"); }
+            }
         }
 
         function renderMarket() {
-            document.getElementById('marketTableBody').innerHTML = localData.market.slice().reverse().map((item, idx) => `
-                <tr class="hover:bg-slate-50 transition-all">
-                    <td class="p-4 font-bold text-slate-700">${item.name}</td>
-                    <td class="p-4 font-black">৳${item.amount}</td>
-                    <td class="p-4 text-[10px] text-slate-400 font-medium">${item.date}</td>
-                    <td class="p-4 text-right"><button onclick="deleteItem('market', ${localData.market.length - 1 - idx})" class="text-slate-200 hover:text-red-400"><i class="fas fa-trash"></i></button></td>
+            document.getElementById('marketTableBody').innerHTML = localData.market.map((item, idx) => `
+                <tr>
+                    <td class="p-4">${item.name}</td>
+                    <td class="p-4 text-center text-gray-400 text-xs">${item.date}</td>
+                    <td class="p-4 font-bold">৳${item.amount}</td>
+                    <td class="p-4 text-right"><button onclick="deleteItem('market', ${idx})" class="text-red-300"><i class="fas fa-trash"></i></button></td>
                 </tr>
-            `).join('');
+            `).reverse().join('');
         }
 
         function renderMealEntry() {
             const date = document.getElementById('mealDate').value;
             const dailyData = localData.dailyMeals[date] || {};
             document.getElementById('mealEntryList').innerHTML = localData.members.map(m => `
-                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <span class="font-bold text-slate-700">${m}</span>
-                    <div class="flex items-center gap-2">
-                         <input type="number" step="0.5" data-member="${m}" value="${dailyData[m] || 0}" class="w-24 p-3 text-center bg-white border-2 border-slate-100 rounded-xl font-black text-indigo-600 focus:border-indigo-400 outline-none">
-                    </div>
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+                    <span class="font-bold">${m}</span>
+                    <input type="number" step="0.5" data-member="${m}" value="${dailyData[m] || 0}" class="w-20 p-2 text-center border rounded-xl font-bold">
                 </div>
             `).join('');
         }
 
         function saveDailyMeals() {
             const date = document.getElementById('mealDate').value;
-            if(!date) return showError("তারিখ সিলেক্ট করুন");
             const entries = {};
             document.querySelectorAll('#mealEntryList input').forEach(inp => {
                 entries[inp.dataset.member] = parseFloat(inp.value) || 0;
             });
             localData.dailyMeals[date] = entries;
             saveData();
-            alert("সফলভাবে সেভ করা হয়েছে!");
+            alert("সেভ করা হয়েছে!");
         }
 
         function addOtherExpense() {
-            const name = document.getElementById('expName').value.trim();
+            const name = document.getElementById('expName').value;
             const amount = parseFloat(document.getElementById('expAmount').value);
             if(name && amount > 0) {
                 localData.otherExpenses.push({ name, amount });
                 document.getElementById('expName').value = "";
                 document.getElementById('expAmount').value = "";
                 saveData();
-            } else { showError("বিবরণ এবং টাকার পরিমাণ দিন"); }
+            }
         }
 
         function renderOthers() {
-            document.getElementById('othersList').innerHTML = localData.otherExpenses.slice().reverse().map((ex, idx) => `
-                <div class="bg-white p-5 rounded-2xl flex justify-between items-center card-shadow border-l-4 border-red-500">
-                    <div>
-                        <p class="font-bold text-slate-700">${ex.name}</p>
-                        <p class="text-red-500 font-black">৳${ex.amount}</p>
-                    </div>
-                    <button onclick="deleteItem('otherExpenses', ${localData.otherExpenses.length - 1 - idx})" class="text-slate-200 hover:text-red-500 transition-all"><i class="fas fa-times-circle text-xl"></i></button>
+            document.getElementById('othersList').innerHTML = localData.otherExpenses.map((ex, idx) => `
+                <div class="bg-white p-5 rounded-2xl flex justify-between items-center shadow-sm border-l-4 border-red-500">
+                    <div><p class="font-bold">${ex.name}</p><p class="text-red-500 font-black">৳${ex.amount}</p></div>
+                    <button onclick="deleteItem('otherExpenses', ${idx})" class="text-gray-300 hover:text-red-500"><i class="fas fa-times-circle text-xl"></i></button>
                 </div>
-            `).join('');
+            `).reverse().join('');
         }
 
         function deleteItem(type, idx) {
-            if(confirm("এটি মুছে ফেলতে চান?")) {
+            if(confirm("মুছে ফেলতে চান?")) {
                 localData[type].splice(idx, 1);
                 saveData();
             }
         }
 
         function renderSummary() {
-            const totalMarket = localData.market.reduce((s, i) => s + i.amount, 0);
-            const totalOthers = localData.otherExpenses.reduce((s, i) => s + i.amount, 0);
+            let totalMarket = localData.market.reduce((s, i) => s + i.amount, 0);
+            let totalOthers = localData.otherExpenses.reduce((s, i) => s + i.amount, 0);
             let totalMeals = 0;
             let stats = {};
 
-            localData.members.forEach(m => stats[m] = { meals: 0, deposit: 0 });
+            localData.members.forEach(m => stats[m] = { meals: 0, deposit: 0, cost: 0 });
 
             for(let d in localData.dailyMeals) {
                 for(let m in localData.dailyMeals[d]) {
@@ -526,29 +452,22 @@
             const mealRate = totalMeals > 0 ? (totalMarket / totalMeals) : 0;
             const perHeadOthers = localData.members.length > 0 ? (totalOthers / localData.members.length) : 0;
 
-            document.getElementById('totalMarketDisplay').innerText = totalMarket.toLocaleString('bn-BD');
+            document.getElementById('totalMarketDisplay').innerText = totalMarket;
             document.getElementById('totalMealDisplay').innerText = totalMeals.toFixed(1);
             document.getElementById('mealRateDisplay').innerText = mealRate.toFixed(2);
-            document.getElementById('totalOthersDisplay').innerText = totalOthers.toLocaleString('bn-BD');
+            document.getElementById('totalOthersDisplay').innerText = totalOthers;
 
             document.getElementById('personalSummaryTable').innerHTML = localData.members.map(m => {
                 const mealCost = stats[m].meals * mealRate;
                 const totalCost = mealCost + perHeadOthers;
                 const balance = stats[m].deposit - totalCost;
                 return `
-                    <tr class="hover:bg-slate-50/50 transition-all">
-                        <td class="p-6">
-                            <div class="font-bold text-slate-800">${m}</div>
-                            <div class="text-[10px] text-slate-400">মেম্বার আইডি: #${m.length}${localData.members.indexOf(m)}</div>
-                        </td>
-                        <td class="p-6 text-center font-bold text-slate-600">${stats[m].meals}</td>
-                        <td class="p-6 text-center text-teal-600 font-bold">৳${stats[m].deposit}</td>
-                        <td class="p-6 text-center text-red-400 font-medium">৳${totalCost.toFixed(1)}</td>
-                        <td class="p-6 text-center">
-                            <span class="px-4 py-2 rounded-xl font-black ${balance >= 0 ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}">
-                                ৳${balance.toFixed(1)}
-                            </span>
-                        </td>
+                    <tr>
+                        <td class="p-4 font-bold">${m}</td>
+                        <td class="p-4 text-center">${stats[m].meals}</td>
+                        <td class="p-4 text-center text-teal-600">৳${stats[m].deposit}</td>
+                        <td class="p-4 text-center text-red-500">৳${totalCost.toFixed(1)}</td>
+                        <td class="p-4 text-center font-black ${balance >= 0 ? 'text-green-600' : 'text-red-600'}">৳${balance.toFixed(1)}</td>
                     </tr>
                 `;
             }).join('');
@@ -556,14 +475,23 @@
 
         function downloadPDF() {
             const element = document.getElementById('pdf-area');
+            const months = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
+            const date = new Date();
+            
+            document.getElementById('pdf-month-title').innerText = `${months[date.getMonth()]} ${date.getFullYear()}`;
+            document.getElementById('pdf-header').classList.remove('hidden');
+            
             const opt = {
-                margin: 10,
-                filename: `Mess_Report_${currentMessId}.pdf`,
+                margin: 5,
+                filename: `Report_${currentMessId}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
+                html2canvas: { scale: 2 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
-            html2pdf().set(opt).from(element).save();
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                document.getElementById('pdf-header').classList.add('hidden');
+            });
         }
     </script>
 </body>
