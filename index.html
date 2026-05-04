@@ -19,11 +19,14 @@
         
         /* PDF এর জন্য বিশেষ স্টাইল */
         #pdf-content { padding: 20px; background: white; }
+        
+        /* প্রিন্ট বা PDF এর সময় হেডার দেখানোর জন্য */
+        .pdf-only-header { display: none; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen pb-20 md:pb-0">
 
-    <!-- Multi-User Auth Overlay -->
+    <!-- Multi-User Auth Overlay (No Change) -->
     <div id="loginOverlay" class="fixed inset-0 bg-indigo-900 z-[100] flex flex-col items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md">
             <h2 class="text-3xl font-black text-center mb-2 text-indigo-800 italic">হিসেবের খাতা</h2>
@@ -55,7 +58,7 @@
 
     <div id="mainDashboard" class="hidden flex flex-col md:flex-row h-screen overflow-hidden">
         
-        <!-- PC Sidebar -->
+        <!-- PC Sidebar (No Change) -->
         <aside class="hidden md:flex w-72 bg-slate-900 text-white flex-col p-6 space-y-6">
             <h1 class="text-2xl font-black text-yellow-400 border-b border-slate-700 pb-4">হিসেবের খাতা</h1>
             <div class="text-xs text-slate-400 bg-slate-800 p-2 rounded-lg truncate">ID: <span id="displayMessId" class="text-yellow-500 font-bold"></span></div>
@@ -85,44 +88,52 @@
                     </button>
                 </header>
 
-                <div id="pdf-area"> <!-- এই অংশটুকু PDF হবে -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-blue-500">
-                            <p class="text-gray-400 text-xs font-bold uppercase">মোট বাজার</p>
-                            <h3 class="text-xl font-black text-gray-800">৳ <span id="totalMarketDisplay">0</span></h3>
-                        </div>
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-green-500">
-                            <p class="text-gray-400 text-xs font-bold uppercase">মোট মিল</p>
-                            <h3 class="text-xl font-black text-gray-800"><span id="totalMealDisplay">0</span></h3>
-                        </div>
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-orange-500">
-                            <p class="text-gray-400 text-xs font-bold uppercase">মিল রেট</p>
-                            <h3 class="text-xl font-black text-gray-800">৳ <span id="mealRateDisplay">0</span></h3>
-                        </div>
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-red-500">
-                            <p class="text-gray-400 text-xs font-bold uppercase">অন্যান্য খরচ</p>
-                            <h3 class="text-xl font-black text-gray-800">৳ <span id="totalOthersDisplay">0</span></h3>
-                        </div>
+                <div id="pdf-area" class="bg-white rounded-2xl"> 
+                    <!-- PDF-Only Header -->
+                    <div id="pdf-header" class="hidden text-center py-6 border-b-2 border-indigo-100 mb-6">
+                        <h1 class="text-4xl font-black text-indigo-800 italic mb-2">হিসেবের খাতা</h1>
+                        <h2 id="pdf-month-title" class="text-xl font-bold text-gray-600"></h2>
                     </div>
 
-                    <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
-                        <table class="w-full text-left text-sm md:text-base min-w-[600px]">
-                            <thead class="bg-slate-800 text-white">
-                                <tr>
-                                    <th class="p-4">নাম</th>
-                                    <th class="p-4 text-center">মিল</th>
-                                    <th class="p-4 text-center">জমা</th>
-                                    <th class="p-4 text-center">মোট খরচ</th>
-                                    <th class="p-4 text-center">ব্যালেন্স</th>
-                                </tr>
-                            </thead>
-                            <tbody id="personalSummaryTable"></tbody>
-                        </table>
+                    <div class="p-4">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                            <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-blue-500">
+                                <p class="text-gray-400 text-xs font-bold uppercase">মোট বাজার</p>
+                                <h3 class="text-xl font-black text-gray-800">৳ <span id="totalMarketDisplay">0</span></h3>
+                            </div>
+                            <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-green-500">
+                                <p class="text-gray-400 text-xs font-bold uppercase">মোট মিল</p>
+                                <h3 class="text-xl font-black text-gray-800"><span id="totalMealDisplay">0</span></h3>
+                            </div>
+                            <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-orange-500">
+                                <p class="text-gray-400 text-xs font-bold uppercase">মিল রেট</p>
+                                <h3 class="text-xl font-black text-gray-800">৳ <span id="mealRateDisplay">0</span></h3>
+                            </div>
+                            <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-red-500">
+                                <p class="text-gray-400 text-xs font-bold uppercase">অন্যান্য খরচ</p>
+                                <h3 class="text-xl font-black text-gray-800">৳ <span id="totalOthersDisplay">0</span></h3>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
+                            <table class="w-full text-left text-sm md:text-base min-w-[600px]">
+                                <thead class="bg-slate-800 text-white">
+                                    <tr>
+                                        <th class="p-4">নাম</th>
+                                        <th class="p-4 text-center">মিল</th>
+                                        <th class="p-4 text-center">জমা</th>
+                                        <th class="p-4 text-center">মোট খরচ</th>
+                                        <th class="p-4 text-center">ব্যালেন্স</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="personalSummaryTable"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </section>
-
-            <!-- MEALS SECTION -->
+            
+            <!-- Other sections (Meals, Deposit, Market, etc.) remain exactly same as your code -->
             <section id="meals-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">প্রতিদিনের মিল এন্ট্রি</h2>
                 <div class="bg-white rounded-2xl shadow-sm p-6 max-w-2xl">
@@ -132,7 +143,6 @@
                 </div>
             </section>
 
-            <!-- DEPOSIT SECTION -->
             <section id="deposit-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">টাকা জমা (Deposit)</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-2xl">
@@ -150,7 +160,6 @@
                 </div>
             </section>
 
-            <!-- MARKET SECTION -->
             <section id="market-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">বাজারের খরচ</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-2xl">
@@ -168,7 +177,6 @@
                 </div>
             </section>
 
-            <!-- OTHERS SECTION -->
             <section id="others-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">অন্যান্য ব্যয়</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-2xl">
@@ -181,7 +189,6 @@
                 <div id="othersList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </section>
 
-            <!-- MEMBERS SECTION -->
             <section id="members-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">মেম্বার ম্যানেজমেন্ট</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-lg">
@@ -208,7 +215,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // Firebase Configuration (Keep your original config)
+        // Firebase Configuration (Same as yours)
         const firebaseConfig = {
             apiKey: "AIzaSyBB02NmJpHi0WS8wUv_JwGZ_scsRRNx7GA",
             authDomain: "hiseber-khata-743e5.firebaseapp.com",
@@ -225,7 +232,7 @@
         let authMode = 'login';
         let localData = { members: [], market: [], dailyMeals: {}, otherExpenses: [], deposits: [] };
 
-        // Authentication Functions
+        // Authentication & Init Functions (Same as yours)
         function toggleAuthMode(mode) {
             authMode = mode;
             const loginTab = document.getElementById('loginTab');
@@ -298,20 +305,35 @@
         function showError(m) { const el = document.getElementById('errorMsg'); el.innerText = m; el.classList.remove('hidden'); }
         function logout() { localStorage.clear(); location.reload(); }
 
-        // PDF Generation Function
+        // PDF Generation Function (UPDATED)
         function downloadPDF() {
             const element = document.getElementById('pdf-area');
+            const pdfHeader = document.getElementById('pdf-header');
+            const monthTitle = document.getElementById('pdf-month-title');
+            
+            // বর্তমান মাসের নাম সেট করা (বাংলায়)
+            const monthsInBengali = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
+            const currentMonth = monthsInBengali[new Date().getMonth()];
+            monthTitle.innerText = `${currentMonth} মাসের আর্থিক হিসাব`;
+            
+            // PDF জেনারেট করার আগে হেডার দেখান
+            pdfHeader.classList.remove('hidden');
+            
             const opt = {
                 margin:       10,
-                filename:     `Mess_Report_${currentMessId}.pdf`,
+                filename:     `Mess_Report_${currentMonth}_${currentMessId}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
-            html2pdf().set(opt).from(element).save();
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                // PDF ডাউনলোড হওয়ার পর হেডার আবার হাইড করুন
+                pdfHeader.classList.add('hidden');
+            });
         }
 
-        // UI Rendering Functions
+        // UI Rendering & Other Functions (Same as yours)
         function refreshUI() {
             renderSummary();
             renderMealEntry();
