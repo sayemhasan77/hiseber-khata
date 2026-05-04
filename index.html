@@ -6,24 +6,26 @@
     <title>হিসেবের খাতা - মেস ম্যানেজমেন্ট</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- PDF Generation Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     
+    <!-- PDF Generation Library (html2pdf) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
         body { font-family: 'Hind Siliguri', sans-serif; }
         .nav-btn:hover { background-color: rgba(79, 70, 229, 0.1); color: #4f46e5; }
         .active-nav { background-color: rgba(79, 70, 229, 0.1); color: #4f46e5; font-weight: bold; }
-        .auth-transition { transition: all 0.3s ease; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        
+        /* PDF এর জন্য বিশেষ স্টাইল */
+        #pdf-content { padding: 20px; background: white; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen pb-20 md:pb-0">
 
     <!-- Multi-User Auth Overlay -->
     <div id="loginOverlay" class="fixed inset-0 bg-indigo-900 z-[100] flex flex-col items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md auth-transition">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md">
             <h2 class="text-3xl font-black text-center mb-2 text-indigo-800 italic">হিসেবের খাতা</h2>
             <p class="text-gray-500 text-center mb-8 text-sm font-medium">আপনার মেস ম্যানেজমেন্ট এখন আরও সহজ</p>
 
@@ -35,24 +37,18 @@
             <div id="authForms" class="space-y-5">
                 <div>
                     <label class="text-xs font-bold text-gray-400 uppercase ml-1">মেস আইডি</label>
-                    <input type="text" id="messId" placeholder="যেমন: mess2026" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-indigo-500 outline-none transition-all">
+                    <input type="text" id="messId" placeholder="যেমন: mess2026" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-indigo-500 outline-none">
                 </div>
-
                 <div>
                     <label class="text-xs font-bold text-gray-400 uppercase ml-1">পাসওয়ার্ড</label>
-                    <input type="password" id="adminPass" placeholder="••••••••" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-indigo-500 outline-none transition-all">
+                    <input type="password" id="adminPass" placeholder="••••••••" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-indigo-500 outline-none">
                 </div>
-
                 <div id="confirmPassContainer" class="hidden">
                     <label class="text-xs font-bold text-gray-400 uppercase ml-1">পাসওয়ার্ড নিশ্চিত করুন</label>
-                    <input type="password" id="confirmPass" placeholder="••••••••" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-indigo-500 outline-none transition-all">
+                    <input type="password" id="confirmPass" placeholder="••••••••" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-indigo-500 outline-none">
                 </div>
-
-                <button id="authActionBtn" onclick="handleAuth()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:bg-indigo-700 transition shadow-lg mt-4 transform active:scale-95">
-                    প্রবেশ করুন
-                </button>
+                <button id="authActionBtn" onclick="handleAuth()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:bg-indigo-700 shadow-lg mt-4 transform active:scale-95">প্রবেশ করুন</button>
             </div>
-            
             <p id="errorMsg" class="text-red-500 text-xs mt-4 text-center bg-red-50 p-2 rounded-lg hidden font-medium"></p>
         </div>
     </div>
@@ -84,47 +80,49 @@
                         <h2 class="text-2xl font-bold text-gray-800">মেস সামারি</h2>
                         <p class="text-gray-500">চলতি মাসের আর্থিক হিসাব</p>
                     </div>
-                    <button onclick="downloadPDF()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-indigo-700 transition">
-                        <i class="fas fa-file-pdf mr-2"></i>PDF ডাউনলোড
+                    <button onclick="downloadPDF()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg hover:bg-indigo-700">
+                        <i class="fas fa-download mr-2"></i>PDF রিপোর্ট
                     </button>
                 </header>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-blue-500">
-                        <p class="text-gray-400 text-xs font-bold uppercase">মোট বাজার</p>
-                        <h3 class="text-xl font-black text-gray-800">৳ <span id="totalMarketDisplay">0</span></h3>
+                <div id="pdf-area"> <!-- এই অংশটুকু PDF হবে -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-blue-500">
+                            <p class="text-gray-400 text-xs font-bold uppercase">মোট বাজার</p>
+                            <h3 class="text-xl font-black text-gray-800">৳ <span id="totalMarketDisplay">0</span></h3>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-green-500">
+                            <p class="text-gray-400 text-xs font-bold uppercase">মোট মিল</p>
+                            <h3 class="text-xl font-black text-gray-800"><span id="totalMealDisplay">0</span></h3>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-orange-500">
+                            <p class="text-gray-400 text-xs font-bold uppercase">মিল রেট</p>
+                            <h3 class="text-xl font-black text-gray-800">৳ <span id="mealRateDisplay">0</span></h3>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-red-500">
+                            <p class="text-gray-400 text-xs font-bold uppercase">অন্যান্য খরচ</p>
+                            <h3 class="text-xl font-black text-gray-800">৳ <span id="totalOthersDisplay">0</span></h3>
+                        </div>
                     </div>
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-green-500">
-                        <p class="text-gray-400 text-xs font-bold uppercase">মোট মিল</p>
-                        <h3 class="text-xl font-black text-gray-800"><span id="totalMealDisplay">0</span></h3>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-orange-500">
-                        <p class="text-gray-400 text-xs font-bold uppercase">মিল রেট</p>
-                        <h3 class="text-xl font-black text-gray-800">৳ <span id="mealRateDisplay">0</span></h3>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-red-500">
-                        <p class="text-gray-400 text-xs font-bold uppercase">অন্যান্য খরচ</p>
-                        <h3 class="text-xl font-black text-gray-800">৳ <span id="totalOthersDisplay">0</span></h3>
-                    </div>
-                </div>
 
-                <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
-                    <table id="summaryTable" class="w-full text-left text-sm md:text-base min-w-[600px]">
-                        <thead class="bg-slate-800 text-white">
-                            <tr>
-                                <th class="p-4">নাম</th>
-                                <th class="p-4 text-center">মিল</th>
-                                <th class="p-4 text-center">জমা</th>
-                                <th class="p-4 text-center">মোট খরচ</th>
-                                <th class="p-4 text-center">ব্যালেন্স</th>
-                            </tr>
-                        </thead>
-                        <tbody id="personalSummaryTable"></tbody>
-                    </table>
+                    <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
+                        <table class="w-full text-left text-sm md:text-base min-w-[600px]">
+                            <thead class="bg-slate-800 text-white">
+                                <tr>
+                                    <th class="p-4">নাম</th>
+                                    <th class="p-4 text-center">মিল</th>
+                                    <th class="p-4 text-center">জমা</th>
+                                    <th class="p-4 text-center">মোট খরচ</th>
+                                    <th class="p-4 text-center">ব্যালেন্স</th>
+                                </tr>
+                            </thead>
+                            <tbody id="personalSummaryTable"></tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
-            <!-- Other sections remain same as your code... -->
+            <!-- MEALS SECTION -->
             <section id="meals-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">প্রতিদিনের মিল এন্ট্রি</h2>
                 <div class="bg-white rounded-2xl shadow-sm p-6 max-w-2xl">
@@ -134,6 +132,7 @@
                 </div>
             </section>
 
+            <!-- DEPOSIT SECTION -->
             <section id="deposit-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">টাকা জমা (Deposit)</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-2xl">
@@ -151,6 +150,7 @@
                 </div>
             </section>
 
+            <!-- MARKET SECTION -->
             <section id="market-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">বাজারের খরচ</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-2xl">
@@ -168,6 +168,7 @@
                 </div>
             </section>
 
+            <!-- OTHERS SECTION -->
             <section id="others-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">অন্যান্য ব্যয়</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-2xl">
@@ -180,6 +181,7 @@
                 <div id="othersList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </section>
 
+            <!-- MEMBERS SECTION -->
             <section id="members-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">মেম্বার ম্যানেজমেন্ট</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-lg">
@@ -193,14 +195,12 @@
         </main>
 
         <!-- Mobile Nav -->
-        <nav id="mobileNav" class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center p-2 z-50 shadow-2xl">
+        <nav id="mobileNav" class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-3 z-50 shadow-2xl">
             <button onclick="showSection('summary')" id="m-summary" class="nav-m-btn flex flex-col items-center text-indigo-600"><i class="fas fa-home"></i><span class="text-[10px]">হোম</span></button>
             <button onclick="showSection('meals')" id="m-meals" class="nav-m-btn flex flex-col items-center text-gray-400"><i class="fas fa-utensils"></i><span class="text-[10px]">মিল</span></button>
             <button onclick="showSection('deposit')" id="m-deposit" class="nav-m-btn flex flex-col items-center text-gray-400"><i class="fas fa-hand-holding-usd"></i><span class="text-[10px]">জমা</span></button>
             <button onclick="showSection('market')" id="m-market" class="nav-m-btn flex flex-col items-center text-gray-400"><i class="fas fa-shopping-basket"></i><span class="text-[10px]">বাজার</span></button>
             <button onclick="showSection('members')" id="m-members" class="nav-m-btn flex flex-col items-center text-gray-400"><i class="fas fa-users"></i><span class="text-[10px]">মেম্বার</span></button>
-            <!-- Logout Button for Mobile -->
-            <button onclick="logout()" class="flex flex-col items-center text-red-500"><i class="fas fa-sign-out-alt"></i><span class="text-[10px]">আউট</span></button>
         </nav>
     </div>
 
@@ -208,6 +208,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
+        // Firebase Configuration (Keep your original config)
         const firebaseConfig = {
             apiKey: "AIzaSyBB02NmJpHi0WS8wUv_JwGZ_scsRRNx7GA",
             authDomain: "hiseber-khata-743e5.firebaseapp.com",
@@ -222,72 +223,9 @@
         const db = firebase.database();
         let currentMessId = "";
         let authMode = 'login';
+        let localData = { members: [], market: [], dailyMeals: {}, otherExpenses: [], deposits: [] };
 
-        let localData = {
-            members: [],
-            market: [],
-            dailyMeals: {},
-            otherExpenses: [],
-            deposits: []
-        };
-
-        // PDF Generation Function
-        function downloadPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            doc.setFontSize(18);
-            doc.text("Hiseber Khata - Monthly Report", 14, 20);
-            doc.setFontSize(12);
-            doc.text(`Mess ID: ${currentMessId}`, 14, 30);
-            doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 37);
-
-            const summaryHeaders = [["Name", "Total Meal", "Deposit", "Cost", "Balance"]];
-            const summaryData = localData.members.map(m => {
-                let stats = getMemberStats(m);
-                return [m, stats.meals, `Tk ${stats.deposit}`, `Tk ${stats.cost}`, `${stats.balance}`];
-            });
-
-            doc.autoTable({
-                startY: 45,
-                head: summaryHeaders,
-                body: summaryData,
-                theme: 'striped',
-                headStyles: { fillColor: [79, 70, 229] }
-            });
-
-            doc.save(`Mess_Report_${currentMessId}.pdf`);
-        }
-
-        // Helper to get stats for PDF
-        function getMemberStats(m) {
-            let totalMarket = localData.market.reduce((sum, item) => sum + item.amount, 0);
-            let totalOthers = localData.otherExpenses.reduce((sum, item) => sum + item.amount, 0);
-            let totalMeals = 0;
-            let mMeals = 0;
-            let mDeposit = 0;
-
-            for(let date in localData.dailyMeals) {
-                for(let member in localData.dailyMeals[date]) {
-                    totalMeals += localData.dailyMeals[date][member];
-                    if(member === m) mMeals += localData.dailyMeals[date][member];
-                }
-            }
-            localData.deposits.forEach(d => { if(d.name === m) mDeposit += d.amount; });
-
-            let mealRate = totalMeals > 0 ? (totalMarket / totalMeals) : 0;
-            let fixedCost = localData.members.length > 0 ? (totalOthers / localData.members.length) : 0;
-            let mCost = (mMeals * mealRate) + fixedCost;
-
-            return {
-                meals: mMeals,
-                deposit: mDeposit,
-                cost: mCost.toFixed(2),
-                balance: (mDeposit - mCost).toFixed(2)
-            };
-        }
-
-        // --- Existing functions from your code below ---
+        // Authentication Functions
         function toggleAuthMode(mode) {
             authMode = mode;
             const loginTab = document.getElementById('loginTab');
@@ -296,14 +234,15 @@
             const actionBtn = document.getElementById('authActionBtn');
             const errorEl = document.getElementById('errorMsg');
             errorEl.classList.add('hidden');
+
             if (mode === 'login') {
-                loginTab.className = "flex-1 py-3 text-sm font-bold rounded-xl transition-all bg-white text-indigo-600 shadow-sm";
-                registerTab.className = "flex-1 py-3 text-sm font-bold rounded-xl transition-all text-gray-500";
+                loginTab.className = "flex-1 py-3 text-sm font-bold rounded-xl bg-white text-indigo-600 shadow-sm";
+                registerTab.className = "flex-1 py-3 text-sm font-bold rounded-xl text-gray-500";
                 confirmContainer.classList.add('hidden');
                 actionBtn.innerText = "প্রবেশ করুন";
             } else {
-                registerTab.className = "flex-1 py-3 text-sm font-bold rounded-xl transition-all bg-white text-indigo-600 shadow-sm";
-                loginTab.className = "flex-1 py-3 text-sm font-bold rounded-xl transition-all text-gray-500";
+                registerTab.className = "flex-1 py-3 text-sm font-bold rounded-xl bg-white text-indigo-600 shadow-sm";
+                loginTab.className = "flex-1 py-3 text-sm font-bold rounded-xl text-gray-500";
                 confirmContainer.classList.remove('hidden');
                 actionBtn.innerText = "অ্যাকাউন্ট তৈরি করুন";
             }
@@ -314,20 +253,17 @@
             const pass = document.getElementById('adminPass').value;
             const confirmPass = document.getElementById('confirmPass').value;
             if (!id || !pass) return showError("আইডি এবং পাসওয়ার্ড দিন");
+
             if (authMode === 'login') {
                 const snapshot = await db.ref('user_accounts/' + id).once('value');
-                if (snapshot.exists() && snapshot.val().pass === pass) {
-                    startSession(id);
-                } else {
-                    showError("ভুল আইডি অথবা পাসওয়ার্ড!");
-                }
+                if (snapshot.exists() && snapshot.val().pass === pass) startSession(id);
+                else showError("ভুল আইডি অথবা পাসওয়ার্ড!");
             } else {
                 if (pass.length < 4) return showError("পাসওয়ার্ড কমপক্ষে ৪ অক্ষরের দিন");
                 if (pass !== confirmPass) return showError("পাসওয়ার্ড দুটি মিলেনি!");
                 const snapshot = await db.ref('user_accounts/' + id).once('value');
                 if (snapshot.exists()) return showError("এই আইডিটি ইতিমধ্যে ব্যবহৃত হয়েছে");
                 await db.ref('user_accounts/' + id).set({ pass: pass });
-                alert("সাফল্যের সাথে মেস আইডি খোলা হয়েছে!");
                 startSession(id);
             }
         }
@@ -362,6 +298,20 @@
         function showError(m) { const el = document.getElementById('errorMsg'); el.innerText = m; el.classList.remove('hidden'); }
         function logout() { localStorage.clear(); location.reload(); }
 
+        // PDF Generation Function
+        function downloadPDF() {
+            const element = document.getElementById('pdf-area');
+            const opt = {
+                margin:       10,
+                filename:     `Mess_Report_${currentMessId}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // UI Rendering Functions
         function refreshUI() {
             renderSummary();
             renderMealEntry();
@@ -369,8 +319,7 @@
             renderOthers();
             renderDeposits();
             renderMembersList();
-            const selects = ['marketMemberSelect', 'depositMemberSelect'];
-            selects.forEach(s => {
+            ['marketMemberSelect', 'depositMemberSelect'].forEach(s => {
                 const el = document.getElementById(s);
                 if(el) {
                     const currentVal = el.value;
@@ -389,7 +338,7 @@
         }
 
         function deleteMember(name) {
-            if(confirm(`${name}-কে ডিলিট করলে তার সকল তথ্য মুছে যাবে। নিশ্চিত তো?`)) {
+            if(confirm(`${name}-কে ডিলিট করলে সকল তথ্য মুছে যাবে। নিশ্চিত?`)) {
                 localData.members = localData.members.filter(m => m !== name);
                 saveData();
             }
@@ -452,7 +401,7 @@
                 ? localData.members.map(m => `
                     <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
                         <span class="font-medium text-slate-700">${m}</span>
-                        <input type="number" step="0.5" data-member="${m}" value="${dailyData[m] || 0}" class="w-20 border-2 border-indigo-50 rounded-lg p-2 text-center font-bold text-indigo-600 focus:border-indigo-400 outline-none">
+                        <input type="number" step="0.5" data-member="${m}" value="${dailyData[m] || 0}" class="w-20 border-2 border-indigo-50 rounded-lg p-2 text-center font-bold text-indigo-600 outline-none">
                     </div>
                 `).join('')
                 : `<p class="text-center text-gray-400 py-4">প্রথমে মেম্বার অ্যাড করুন</p>`;
@@ -484,13 +433,13 @@
             document.getElementById('othersList').innerHTML = localData.otherExpenses.map((ex, idx) => `
                 <div class="bg-white p-4 rounded-xl flex justify-between items-center shadow-sm border-l-4 border-red-500">
                     <div><p class="font-bold text-slate-700">${ex.name}</p><p class="text-red-500 font-bold">৳ ${ex.amount}</p></div>
-                    <button onclick="deleteItem('otherExpenses', ${idx})" class="text-gray-300 hover:text-red-500 transition"><i class="fas fa-times-circle text-xl"></i></button>
+                    <button onclick="deleteItem('otherExpenses', ${idx})" class="text-gray-300 hover:text-red-500"><i class="fas fa-times-circle text-xl"></i></button>
                 </div>
             `).reverse().join('');
         }
 
         function deleteItem(type, index) {
-            if(confirm("আপনি কি নিশ্চিত এটি ডিলিট করতে চান?")) {
+            if(confirm("ডিলিট করতে চান?")) {
                 localData[type].splice(index, 1);
                 saveData();
             }
@@ -542,9 +491,7 @@
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-nav'));
             const pcBtn = document.getElementById('pc-' + id);
             if(pcBtn) pcBtn.classList.add('active-nav');
-            document.querySelectorAll('.nav-m-btn').forEach(b => {
-                b.classList.replace('text-indigo-600', 'text-gray-400');
-            });
+            document.querySelectorAll('.nav-m-btn').forEach(b => b.classList.replace('text-indigo-600', 'text-gray-400'));
             const mBtn = document.getElementById('m-' + id);
             if(mBtn) mBtn.classList.replace('text-gray-400', 'text-indigo-600');
         }
