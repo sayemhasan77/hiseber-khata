@@ -11,34 +11,58 @@
         body { font-family: 'Hind Siliguri', sans-serif; }
         .nav-btn:hover { background-color: rgba(79, 70, 229, 0.1); color: #4f46e5; }
         .active-nav { background-color: rgba(79, 70, 229, 0.1); color: #4f46e5; font-weight: bold; }
+        /* Smooth transitions */
+        .auth-transition { transition: all 0.3s ease; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen pb-20 md:pb-0">
 
     <!-- Multi-User Auth Overlay -->
-    <div id="loginOverlay" class="fixed inset-0 bg-indigo-900 z-[100] flex flex-col items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm">
-            <h2 class="text-2xl font-bold text-center mb-6 text-indigo-800 italic">হিসেবের খাতা</h2>
-            
-            <div id="authForms">
-                <div class="space-y-4">
-                    <input type="text" id="messId" placeholder="মেস আইডি (যেমন: mess2024)" class="w-full border-2 border-gray-200 p-3 rounded-xl text-center focus:border-indigo-500 outline-none">
-                    <input type="password" id="adminPass" placeholder="পাসওয়ার্ড" class="w-full border-2 border-gray-200 p-3 rounded-xl text-center focus:border-indigo-500 outline-none">
-                    <button onclick="processLogin()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg">প্রবেশ করুন</button>
-                    <button onclick="processRegister()" class="w-full border-2 border-indigo-600 text-indigo-600 py-3 rounded-xl font-bold hover:bg-indigo-50 transition">নতুন মেস আইডি খুলুন</button>
-                </div>
+    <div id="loginOverlay" class="fixed inset-0 bg-indigo-900 z-[100] flex flex-col items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md auth-transition">
+            <h2 class="text-3xl font-black text-center mb-2 text-indigo-800 italic">হিসেবের খাতা</h2>
+            <p class="text-gray-500 text-center mb-8 text-sm font-medium">আপনার মেস ম্যানেজমেন্ট এখন আরও সহজ</p>
+
+            <!-- Tab Switcher -->
+            <div class="flex bg-gray-100 p-1 rounded-2xl mb-8">
+                <button id="loginTab" onclick="toggleAuthMode('login')" class="flex-1 py-3 text-sm font-bold rounded-xl transition-all bg-white text-indigo-600 shadow-sm">লগইন</button>
+                <button id="registerTab" onclick="toggleAuthMode('register')" class="flex-1 py-3 text-sm font-bold rounded-xl transition-all text-gray-500">নতুন অ্যাকাউন্ট</button>
             </div>
             
-            <p id="errorMsg" class="text-red-500 text-sm mt-3 text-center hidden"></p>
+            <div id="authForms" class="space-y-5">
+                <!-- Mess ID -->
+                <div>
+                    <label class="text-xs font-bold text-gray-400 uppercase ml-1">মেস আইডি</label>
+                    <input type="text" id="messId" placeholder="যেমন: mess2026" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-indigo-500 outline-none transition-all">
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label class="text-xs font-bold text-gray-400 uppercase ml-1">পাসওয়ার্ড</label>
+                    <input type="password" id="adminPass" placeholder="••••••••" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-indigo-500 outline-none transition-all">
+                </div>
+
+                <!-- Confirm Password (Hidden in Login Mode) -->
+                <div id="confirmPassContainer" class="hidden">
+                    <label class="text-xs font-bold text-gray-400 uppercase ml-1">পাসওয়ার্ড নিশ্চিত করুন</label>
+                    <input type="password" id="confirmPass" placeholder="••••••••" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-indigo-500 outline-none transition-all">
+                </div>
+
+                <button id="authActionBtn" onclick="handleAuth()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:bg-indigo-700 transition shadow-lg mt-4 transform active:scale-95">
+                    প্রবেশ করুন
+                </button>
+            </div>
+            
+            <p id="errorMsg" class="text-red-500 text-xs mt-4 text-center bg-red-50 p-2 rounded-lg hidden font-medium"></p>
         </div>
     </div>
 
     <div id="mainDashboard" class="hidden flex flex-col md:flex-row h-screen overflow-hidden">
         
-        <!-- PC Sidebar (Dark as per your team design) -->
+        <!-- PC Sidebar -->
         <aside class="hidden md:flex w-72 bg-slate-900 text-white flex-col p-6 space-y-6">
             <h1 class="text-2xl font-black text-yellow-400 border-b border-slate-700 pb-4">হিসেবের খাতা</h1>
-            <div class="text-xs text-slate-400 bg-slate-800 p-2 rounded-lg truncate">ID: <span id="displayMessId" class="text-yellow-500"></span></div>
+            <div class="text-xs text-slate-400 bg-slate-800 p-2 rounded-lg truncate">ID: <span id="displayMessId" class="text-yellow-500 font-bold"></span></div>
             <nav class="space-y-2 flex-1">
                 <button onclick="showSection('summary')" id="pc-summary" class="nav-btn w-full text-left p-3 rounded-xl transition active-nav"><i class="fas fa-home mr-3 text-blue-400"></i>ড্যাশবোর্ড</button>
                 <button onclick="showSection('meals')" id="pc-meals" class="nav-btn w-full text-left p-3 rounded-xl transition"><i class="fas fa-utensils mr-3 text-green-400"></i>মিল এন্ট্রি</button>
@@ -80,8 +104,8 @@
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-800 text-white text-sm">
+                    <table class="w-full text-left text-sm md:text-base">
+                        <thead class="bg-slate-800 text-white">
                             <tr>
                                 <th class="p-4">নাম</th>
                                 <th class="p-4 text-center">মিল</th>
@@ -95,7 +119,7 @@
                 </div>
             </section>
 
-            <!-- Other sections remain same as your provided code -->
+            <!-- Other sections -->
             <section id="meals-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">প্রতিদিনের মিল এন্ট্রি</h2>
                 <div class="bg-white rounded-2xl shadow-sm p-6 max-w-2xl">
@@ -132,7 +156,7 @@
                     </div>
                 </div>
                 <div class="bg-white rounded-2xl shadow-sm overflow-hidden max-w-2xl">
-                    <table class="w-full text-left">
+                    <table class="w-full text-left text-sm">
                         <thead class="bg-gray-100"><tr><th class="p-4">নাম</th><th class="p-4 text-center">তারিখ</th><th class="p-4">টাকা</th><th class="p-4">মুছে ফেলুন</th></tr></thead>
                         <tbody id="marketTableBody"></tbody>
                     </table>
@@ -190,6 +214,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         let currentMessId = "";
+        let authMode = 'login';
 
         let localData = {
             members: [],
@@ -199,30 +224,55 @@
             deposits: []
         };
 
-        // --- AUTH LOGIC (Multi-User) ---
-        async function processLogin() {
-            const id = document.getElementById('messId').value.trim().toLowerCase();
-            const pass = document.getElementById('adminPass').value;
-            if(!id || !pass) return showError("আইডি এবং পাসওয়ার্ড দিন");
+        // --- AUTH LOGIC ---
+        function toggleAuthMode(mode) {
+            authMode = mode;
+            const loginTab = document.getElementById('loginTab');
+            const registerTab = document.getElementById('registerTab');
+            const confirmContainer = document.getElementById('confirmPassContainer');
+            const actionBtn = document.getElementById('authActionBtn');
+            const errorEl = document.getElementById('errorMsg');
 
-            const snapshot = await db.ref('user_accounts/' + id).once('value');
-            if(snapshot.exists() && snapshot.val().pass === pass) {
-                startSession(id);
+            errorEl.classList.add('hidden');
+
+            if (mode === 'login') {
+                loginTab.className = "flex-1 py-3 text-sm font-bold rounded-xl transition-all bg-white text-indigo-600 shadow-sm";
+                registerTab.className = "flex-1 py-3 text-sm font-bold rounded-xl transition-all text-gray-500";
+                confirmContainer.classList.add('hidden');
+                actionBtn.innerText = "প্রবেশ করুন";
             } else {
-                showError("ভুল আইডি অথবা পাসওয়ার্ড!");
+                registerTab.className = "flex-1 py-3 text-sm font-bold rounded-xl transition-all bg-white text-indigo-600 shadow-sm";
+                loginTab.className = "flex-1 py-3 text-sm font-bold rounded-xl transition-all text-gray-500";
+                confirmContainer.classList.remove('hidden');
+                actionBtn.innerText = "অ্যাকাউন্ট তৈরি করুন";
             }
         }
 
-        async function processRegister() {
+        async function handleAuth() {
             const id = document.getElementById('messId').value.trim().toLowerCase();
             const pass = document.getElementById('adminPass').value;
-            if(!id || pass.length < 4) return showError("আইডি দিন এবং পাসওয়ার্ড কমপক্ষে ৪ অক্ষরের দিন");
+            const confirmPass = document.getElementById('confirmPass').value;
 
-            const snapshot = await db.ref('user_accounts/' + id).once('value');
-            if(snapshot.exists()) return showError("এই আইডিটি ইতিমধ্যে ব্যবহৃত হয়েছে");
+            if (!id || !pass) return showError("আইডি এবং পাসওয়ার্ড দিন");
 
-            await db.ref('user_accounts/' + id).set({ pass: pass });
-            startSession(id);
+            if (authMode === 'login') {
+                const snapshot = await db.ref('user_accounts/' + id).once('value');
+                if (snapshot.exists() && snapshot.val().pass === pass) {
+                    startSession(id);
+                } else {
+                    showError("ভুল আইডি অথবা পাসওয়ার্ড!");
+                }
+            } else {
+                if (pass.length < 4) return showError("পাসওয়ার্ড কমপক্ষে ৪ অক্ষরের দিন");
+                if (pass !== confirmPass) return showError("পাসওয়ার্ড দুটি মিলেনি!");
+
+                const snapshot = await db.ref('user_accounts/' + id).once('value');
+                if (snapshot.exists()) return showError("এই আইডিটি ইতিমধ্যে ব্যবহৃত হয়েছে");
+
+                await db.ref('user_accounts/' + id).set({ pass: pass });
+                alert("সাফল্যের সাথে মেস আইডি খোলা হয়েছে!");
+                startSession(id);
+            }
         }
 
         function startSession(id) {
@@ -264,7 +314,7 @@
             location.reload();
         }
 
-        // --- Logic and UI Refresh (Unchanged from your team) ---
+        // --- Logic and UI Refresh ---
         function refreshUI() {
             renderSummary();
             renderMealEntry();
@@ -442,12 +492,10 @@
             document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
             document.getElementById(id + '-section').classList.remove('hidden');
             
-            // UI highlights
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-nav'));
             document.getElementById('pc-' + id).classList.add('active-nav');
             
             document.querySelectorAll('.nav-m-btn').forEach(b => b.classList.replace('text-indigo-600', 'text-gray-400'));
-            // logic for mobile nav highlight would go here
         }
 
         window.onload = () => {
