@@ -16,17 +16,12 @@
         .nav-btn:hover { background-color: rgba(79, 70, 229, 0.1); color: #4f46e5; }
         .active-nav { background-color: rgba(79, 70, 229, 0.1); color: #4f46e5; font-weight: bold; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        
-        /* PDF এর জন্য বিশেষ স্টাইল */
         #pdf-content { padding: 20px; background: white; }
-        
-        /* প্রিন্ট বা PDF এর সময় হেডার দেখানোর জন্য */
-        .pdf-only-header { display: none; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen pb-20 md:pb-0">
 
-    <!-- Multi-User Auth Overlay (No Change) -->
+    <!-- Multi-User Auth Overlay -->
     <div id="loginOverlay" class="fixed inset-0 bg-indigo-900 z-[100] flex flex-col items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md">
             <h2 class="text-3xl font-black text-center mb-2 text-indigo-800 italic">হিসেবের খাতা</h2>
@@ -58,7 +53,7 @@
 
     <div id="mainDashboard" class="hidden flex flex-col md:flex-row h-screen overflow-hidden">
         
-        <!-- PC Sidebar (No Change) -->
+        <!-- PC Sidebar -->
         <aside class="hidden md:flex w-72 bg-slate-900 text-white flex-col p-6 space-y-6">
             <h1 class="text-2xl font-black text-yellow-400 border-b border-slate-700 pb-4">হিসেবের খাতা</h1>
             <div class="text-xs text-slate-400 bg-slate-800 p-2 rounded-lg truncate">ID: <span id="displayMessId" class="text-yellow-500 font-bold"></span></div>
@@ -83,9 +78,16 @@
                         <h2 class="text-2xl font-bold text-gray-800">মেস সামারি</h2>
                         <p class="text-gray-500">চলতি মাসের আর্থিক হিসাব</p>
                     </div>
-                    <button onclick="downloadPDF()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg hover:bg-indigo-700">
-                        <i class="fas fa-download mr-2"></i>PDF রিপোর্ট
-                    </button>
+                    
+                    <div class="flex gap-2">
+                        <!-- মোবাইল লগআউট বাটন -->
+                        <button onclick="logout()" class="md:hidden bg-red-50 text-red-600 w-10 h-10 flex items-center justify-center rounded-xl border border-red-100 shadow-sm">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                        <button onclick="downloadPDF()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg hover:bg-indigo-700">
+                            <i class="fas fa-download md:mr-2"></i><span class="hidden md:inline">PDF রিপোর্ট</span>
+                        </button>
+                    </div>
                 </header>
 
                 <div id="pdf-area" class="bg-white rounded-2xl"> 
@@ -93,6 +95,7 @@
                     <div id="pdf-header" class="hidden text-center py-6 border-b-2 border-indigo-100 mb-6">
                         <h1 class="text-4xl font-black text-indigo-800 italic mb-2">হিসেবের খাতা</h1>
                         <h2 id="pdf-month-title" class="text-xl font-bold text-gray-600"></h2>
+                        <p class="text-sm text-gray-400">মেস আইডি: <span id="pdf-mess-id"></span></p>
                     </div>
 
                     <div class="p-4">
@@ -133,7 +136,7 @@
                 </div>
             </section>
             
-            <!-- Other sections (Meals, Deposit, Market, etc.) remain exactly same as your code -->
+            <!-- MEALS SECTION -->
             <section id="meals-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">প্রতিদিনের মিল এন্ট্রি</h2>
                 <div class="bg-white rounded-2xl shadow-sm p-6 max-w-2xl">
@@ -143,6 +146,7 @@
                 </div>
             </section>
 
+            <!-- DEPOSIT SECTION -->
             <section id="deposit-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">টাকা জমা (Deposit)</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-2xl">
@@ -160,6 +164,7 @@
                 </div>
             </section>
 
+            <!-- MARKET SECTION -->
             <section id="market-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">বাজারের খরচ</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-2xl">
@@ -177,6 +182,7 @@
                 </div>
             </section>
 
+            <!-- OTHERS SECTION -->
             <section id="others-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">অন্যান্য ব্যয়</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-2xl">
@@ -189,6 +195,7 @@
                 <div id="othersList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </section>
 
+            <!-- MEMBERS SECTION -->
             <section id="members-section" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6">মেম্বার ম্যানেজমেন্ট</h2>
                 <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 max-w-lg">
@@ -211,11 +218,12 @@
         </nav>
     </div>
 
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // Firebase Configuration (Same as yours)
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBB02NmJpHi0WS8wUv_JwGZ_scsRRNx7GA",
             authDomain: "hiseber-khata-743e5.firebaseapp.com",
@@ -232,7 +240,7 @@
         let authMode = 'login';
         let localData = { members: [], market: [], dailyMeals: {}, otherExpenses: [], deposits: [] };
 
-        // Authentication & Init Functions (Same as yours)
+        // Auth Logic
         function toggleAuthMode(mode) {
             authMode = mode;
             const loginTab = document.getElementById('loginTab');
@@ -303,37 +311,38 @@
 
         function saveData() { db.ref('mess_storage/' + currentMessId).set(localData); }
         function showError(m) { const el = document.getElementById('errorMsg'); el.innerText = m; el.classList.remove('hidden'); }
-        function logout() { localStorage.clear(); location.reload(); }
+        function logout() { if(confirm("লগআউট করতে চান?")) { localStorage.clear(); location.reload(); } }
 
-        // PDF Generation Function (UPDATED)
+        // PDF Generator
         function downloadPDF() {
             const element = document.getElementById('pdf-area');
             const pdfHeader = document.getElementById('pdf-header');
             const monthTitle = document.getElementById('pdf-month-title');
+            const pdfId = document.getElementById('pdf-mess-id');
             
-            // বর্তমান মাসের নাম সেট করা (বাংলায়)
             const monthsInBengali = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
-            const currentMonth = monthsInBengali[new Date().getMonth()];
-            monthTitle.innerText = `${currentMonth} মাসের আর্থিক হিসাব`;
+            const date = new Date();
+            const currentMonth = monthsInBengali[date.getMonth()];
             
-            // PDF জেনারেট করার আগে হেডার দেখান
+            monthTitle.innerText = `${currentMonth} ${date.getFullYear()} মাসের আর্থিক হিসাব`;
+            pdfId.innerText = currentMessId;
+            
             pdfHeader.classList.remove('hidden');
             
             const opt = {
                 margin:       10,
-                filename:     `Mess_Report_${currentMonth}_${currentMessId}.pdf`,
+                filename:     `Report_${currentMonth}_${currentMessId}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
             
             html2pdf().set(opt).from(element).save().then(() => {
-                // PDF ডাউনলোড হওয়ার পর হেডার আবার হাইড করুন
                 pdfHeader.classList.add('hidden');
             });
         }
 
-        // UI Rendering & Other Functions (Same as yours)
+        // UI Refresh Logic
         function refreshUI() {
             renderSummary();
             renderMealEntry();
@@ -350,6 +359,7 @@
             });
         }
 
+        // Functions for Members, Deposits, Market, Meals, Others
         function addMember() {
             const name = document.getElementById('newMemberName').value.trim();
             if(name && !localData.members.includes(name)) {
